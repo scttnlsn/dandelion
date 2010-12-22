@@ -1,4 +1,4 @@
-require 'git'
+require 'deploy/git'
 
 module Deployment
   
