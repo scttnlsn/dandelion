@@ -9,9 +9,9 @@ module Deploy
     
     attr_reader :revision
     
-    def initialize(revision)
+    def initialize(dir, revision)
       @revision = revision
-      @raw = `git diff --name-status #{@revision} HEAD`
+      @raw = `cd #{dir}; git diff --name-status #{@revision} HEAD`
     end
   
     def changed
@@ -37,8 +37,8 @@ module Deploy
 
   class Tree
   
-    def initialize(revision)
-      @commit = Grit::Repo.new('.').commit(revision)
+    def initialize(dir, revision)
+      @commit = Grit::Repo.new(dir).commit(revision)
       @tree = @commit.tree
     end
   
@@ -131,10 +131,10 @@ module Deploy
   
   class Deployment
     
-    def initialize(service, revision = 'HEAD')
+    def initialize(dir, service, revision = 'HEAD')
       @service = service
-      @diff = Diff.new(read_revision)
-      @tree = Tree.new(revision)
+      @diff = Diff.new(dir, read_revision)
+      @tree = Tree.new(dir, revision)
     end
     
     def local_revision
@@ -207,7 +207,7 @@ module Deploy
       begin
         
         # Deploy changes since remote revision
-        deployment = Deployment.new(service)
+        deployment = Deployment.new('.', service)
 
         puts "Remote revision:  #{deployment.remote_revision}"
         puts "Local revision:   #{deployment.local_revision}"
