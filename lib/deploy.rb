@@ -131,11 +131,10 @@ module Deploy
   
   class Deployment
     
-    def initialize(config, revision = 'HEAD')
-      @config = config
-      @service = create_service
-      @diff = Deploy::Diff.new(read_revision)
-      @tree = Deploy::Tree.new(revision)
+    def initialize(service, revision = 'HEAD')
+      @service = service
+      @diff = Diff.new(read_revision)
+      @tree = Tree.new(revision)
     end
     
     def local_revision
@@ -161,7 +160,6 @@ module Deploy
           @service.delete(file)
         end
         @service.write('.revision', local_revision)
-        puts "Deployment complete"
       else
         puts "Nothing to deploy"
       end
@@ -169,23 +167,18 @@ module Deploy
     
     private
     
-    def create_service
-      if @config['scheme'] == 'sftp'
-        SFTP.new(@config['host'], @config['username'], @config['password'], @config['path'])
-      else
-        raise "Unsupported scheme: #{@config['scheme']}"
-      end
-    end
-    
     def read_revision
       begin
         @service.read('.revision').chomp
       rescue Net::SFTP::StatusException => e
         raise unless e.code == 2
-        raise "Could not find remote file: .revision"
+        raise RemoteRevisionError
       end
     end
     
+  end
+  
+  class RemoteRevisionError < StandardError
   end
   
   class << self
@@ -202,14 +195,43 @@ module Deploy
       end
 
       config = YAML.load_file 'deploy.yml'
+      
+      if config['scheme'] == 'sftp'
+        service = SFTP.new(config['host'], config['username'], config['password'], config['path'])
+      else
+        puts "Unsupported scheme: #{config['scheme']}"
+      end
+      
+      puts "Connecting to:   #{service.uri}"
 
-      deployment = Deploy::Deployment.new(config)
+      begin
+        
+        # Deploy changes since remote revision
+        deployment = Deployment.new(service)
 
-      puts "Connected to:     #{deployment.remote_uri}"
-      puts "Remote revision:  #{deployment.remote_revision}"
-      puts "Local revision:   #{deployment.local_revision}"
+        puts "Remote revision:  #{deployment.remote_revision}"
+        puts "Local revision:   #{deployment.local_revision}"
 
-      deployment.deploy
+        deployment.deploy
+        
+      rescue RemoteRevisionError
+        
+        # No remote revision, deploy everything
+        tree = Tree.new('HEAD')
+        
+        puts "Remote revision:  ---"
+        puts "Local revision:   #{tree.revision}"
+
+        files = `git ls-tree --name-only -r HEAD`
+        files.split("\n").each do |file|
+          service.write(file, tree.show(file))
+        end
+        
+        service.write('.revision', tree.revision)
+      end
+      
+      puts "Deployment complete"
+            
     end
     
   end
