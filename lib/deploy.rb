@@ -30,7 +30,7 @@ module Deploy
       begin
         
         # Deploy changes since remote revision
-        deployment = Deployment::DiffDeployment.new('.', service)
+        deployment = Deployment::DiffDeployment.new('.', service, config['exclude'])
 
         puts "Remote revision:  #{deployment.remote_revision}"
         puts "Local revision:   #{deployment.local_revision}"
@@ -40,7 +40,7 @@ module Deploy
       rescue Deployment::RemoteRevisionError
         
         # No remote revision, deploy everything
-        deployment = Deployment::FullDeployment.new('.', service)
+        deployment = Deployment::FullDeployment.new('.', service, config['exclude'])
         
         puts "Remote revision:  ---"
         puts "Local revision:   #{deployment.local_revision}"

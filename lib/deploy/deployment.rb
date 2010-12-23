@@ -6,8 +6,9 @@ module Deployment
   
   class Deployment
     
-    def initialize(dir, service, revision = 'HEAD')
+    def initialize(dir, service, exclude = nil, revision = 'HEAD')
       @service = service
+      @exclude = exclude || []
       @tree = Git::Tree.new(dir, revision)
     end
     
@@ -27,8 +28,8 @@ module Deployment
   
   class DiffDeployment < Deployment
     
-    def initialize(dir, service, revision = 'HEAD')
-      super(dir, service, revision)
+    def initialize(dir, service, exclude = nil, revision = 'HEAD')
+      super(dir, service, exclude, revision)
       @diff = Git::Diff.new(dir, read_revision)
     end
     
@@ -39,12 +40,16 @@ module Deployment
     def deploy
       if remote_revision != local_revision
         @diff.changed.each do |file|
-          puts "Uploading file: #{file}"
-          @service.write(file, @tree.show(file))
+          unless @exclude.include?(file)
+            puts "Uploading file: #{file}"
+            @service.write(file, @tree.show(file))
+          end
         end
         @diff.deleted.each do |file|
-          puts "Deleting file: #{file}"
-          @service.delete(file)
+          unless @exclude.include?(file)
+            puts "Deleting file: #{file}"
+            @service.delete(file)
+          end
         end
         write_revision
       else
@@ -69,8 +74,10 @@ module Deployment
     
     def deploy
       @tree.files.each do |file|
-        puts "Uploading file: #{file}"
-        @service.write(file, @tree.show(file))
+        unless @exclude.include?(file)
+          puts "Uploading file: #{file}"
+          @service.write(file, @tree.show(file))
+        end
       end
       write_revision
     end

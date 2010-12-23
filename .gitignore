@@ -1,3 +1,5 @@
 pkg/
 Manifest
 .DS_Store
+*.gem
+*.gemspec
