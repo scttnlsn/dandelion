@@ -3,8 +3,9 @@ git-deploy
 
 Install
 -------
-Download the gem from https://github.com/downloads/scottbnel/git-deploy/git-deploy-0.0.1.gem and run:
+Download and install the gem:
 
+    $ wget --no-check-certificate https://github.com/downloads/scottbnel/git-deploy/git-deploy-0.0.1.gem
     $ gem install git-deploy
     
 Usage
