@@ -1,4 +1,5 @@
 require 'net/sftp'
+require 'tempfile'
 
 module Service
   
@@ -39,9 +40,11 @@ module Service
         raise unless e.code == 2
         mkdir_p(dir)
       end
-      @sftp.file.open(path, 'w') do |f|
-        f.write data
-      end
+      tmp = Tempfile.new(file.gsub('/', '.'))
+      tmp << data
+      tmp.flush
+      @sftp.upload!(tmp.path, path)
+      tmp.close
     end
     
     def delete(file)
