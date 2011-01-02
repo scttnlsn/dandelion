@@ -40,7 +40,7 @@ module Service
         mkdir_p(dir)
       end
       @sftp.file.open(path, 'w') do |f|
-        f.puts data
+        f.write data
       end
     end
     
