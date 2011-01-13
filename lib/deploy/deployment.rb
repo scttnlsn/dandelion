@@ -1,11 +1,9 @@
 require 'deploy/git'
 
 module Deployment
-  
   class RemoteRevisionError < StandardError; end
   
   class Deployment
-    
     def initialize(dir, service, exclude = nil, revision = 'HEAD')
       @service = service
       @exclude = exclude || []
@@ -23,11 +21,9 @@ module Deployment
     def write_revision
       @service.write('.revision', local_revision)
     end
-    
   end
   
   class DiffDeployment < Deployment
-    
     def initialize(dir, service, exclude = nil, revision = 'HEAD')
       super(dir, service, exclude, revision)
       @diff = Git::Diff.new(dir, read_revision)
@@ -67,11 +63,9 @@ module Deployment
         raise RemoteRevisionError
       end
     end
-    
   end
   
   class FullDeployment < Deployment
-    
     def deploy
       @tree.files.each do |file|
         unless @exclude.include?(file)
@@ -81,7 +75,5 @@ module Deployment
       end
       write_revision
     end
-    
   end
-  
 end

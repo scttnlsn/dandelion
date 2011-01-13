@@ -2,9 +2,7 @@ require 'net/sftp'
 require 'tempfile'
 
 module Service
-  
   class Service
-    
     def initialize(host, username, path)
       @host = host
       @username = username
@@ -14,11 +12,9 @@ module Service
     def uri
       "#{@scheme}://#{@username}@#{@host}/#{@path}"
     end
-    
   end
   
   class SFTP < Service
-
     def initialize(host, username, password, path)
       super(host, username, path)
       @scheme = 'sftp'
@@ -79,7 +75,5 @@ module Service
         mkdir_p(dir)
       end
     end
-
   end
-  
 end

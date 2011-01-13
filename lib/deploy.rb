@@ -3,9 +3,7 @@ require 'deploy/service'
 require 'yaml'
 
 module Deploy
-  
   class << self
-    
     def run
       unless File.exists? '.git'
         puts 'Not a git repository: .git'
@@ -28,7 +26,6 @@ module Deploy
       puts "Connecting to:   #{service.uri}"
 
       begin
-        
         # Deploy changes since remote revision
         deployment = Deployment::DiffDeployment.new('.', service, config['exclude'])
 
@@ -36,9 +33,7 @@ module Deploy
         puts "Local revision:   #{deployment.local_revision}"
 
         deployment.deploy
-        
       rescue Deployment::RemoteRevisionError
-        
         # No remote revision, deploy everything
         deployment = Deployment::FullDeployment.new('.', service, config['exclude'])
         
@@ -46,13 +41,9 @@ module Deploy
         puts "Local revision:   #{deployment.local_revision}"
 
         deployment.deploy
-
       end
       
       puts "Deployment complete"
-            
     end
-    
   end
-
 end

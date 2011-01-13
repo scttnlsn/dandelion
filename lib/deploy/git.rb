@@ -1,9 +1,7 @@
 require 'grit'
 
 module Git
-
   class Diff
-  
     attr_reader :revision
   
     def initialize(dir, revision)
@@ -29,11 +27,9 @@ module Git
       end
       items
     end
-
   end
 
   class Tree
-
     def initialize(dir, revision)
       @dir = dir
       @commit = Grit::Repo.new(dir).commit(revision)
@@ -51,7 +47,5 @@ module Git
     def revision
       @commit.sha
     end
-
   end
-
 end
