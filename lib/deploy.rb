@@ -21,6 +21,7 @@ module Deploy
         service = Service::SFTP.new(config['host'], config['username'], config['password'], config['path'])
       else
         puts "Unsupported scheme: #{config['scheme']}"
+        exit
       end
       
       puts "Connecting to:   #{service.uri}"
