@@ -1,4 +1,4 @@
-require 'deploy/git'
+require 'dandelion/git'
 
 module Deployment
   class RemoteRevisionError < StandardError; end

@@ -1,8 +1,8 @@
-require 'deploy/deployment'
-require 'deploy/service'
+require 'dandelion/deployment'
+require 'dandelion/service'
 require 'yaml'
 
-module Deploy
+module Dandelion
   class << self
     def run
       unless File.exists? '.git'
@@ -16,14 +16,14 @@ module Deploy
       end
 
       config = YAML.load_file 'deploy.yml'
-      
+
       if config['scheme'] == 'sftp'
         service = Service::SFTP.new(config['host'], config['username'], config['password'], config['path'])
       else
         puts "Unsupported scheme: #{config['scheme']}"
         exit
       end
-      
+
       puts "Connecting to:   #{service.uri}"
 
       begin
@@ -37,13 +37,13 @@ module Deploy
       rescue Deployment::RemoteRevisionError
         # No remote revision, deploy everything
         deployment = Deployment::FullDeployment.new('.', service, config['exclude'])
-        
+
         puts "Remote revision:  ---"
         puts "Local revision:   #{deployment.local_revision}"
 
         deployment.deploy
       end
-      
+
       puts "Deployment complete"
     end
   end
