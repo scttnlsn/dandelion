@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email       = ['scottbnel@gmail.com']
   s.homepage    = 'http://github.com/scottbnel/dandelion'
   s.summary     = "dandelion-#{s.version}"
-  s.description = 'A Ruby gem for Git repository deployment via SFTP'
+  s.description = 'Git repository deployment via SFTP'
   
   s.add_dependency 'net-sftp', '>= 2.0.5'
   s.add_dependency 'grit', '>= 2.4.1'
