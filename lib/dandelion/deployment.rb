@@ -34,12 +34,14 @@ module Deployment
     end
     
     def deploy
-      if remote_revision != local_revision && any?
+      if !revisions_match? && any?
         deploy_changed
         deploy_deleted
-        write_revision
       else
         puts "Nothing to deploy"
+      end
+      unless revisions_match?
+        write_revision
       end
     end
     
@@ -67,6 +69,10 @@ module Deployment
     
     def any?
       @diff.changed.any? || @diff.deleted.any?
+    end
+    
+    def revisions_match?
+      remote_revision == local_revision
     end
     
     private

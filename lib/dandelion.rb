@@ -30,7 +30,7 @@ module Dandelion
         exit
       end
 
-      puts "Connecting to:   #{service.uri}"
+      puts "Connecting to:    #{service.uri}"
 
       begin
         # Deploy changes since remote revision
