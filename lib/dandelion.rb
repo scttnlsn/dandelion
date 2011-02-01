@@ -9,9 +9,15 @@ module Dandelion
         puts 'Not a git repository: .git'
         exit
       end
+      
+      if ARGV[0]
+        config_file = ARGV[0].strip
+      else
+        config_file = 'dandelion.yml'
+      end
 
-      unless File.exists? 'deploy.yml'
-        puts 'Could not find file: deploy.yml'
+      unless File.exists? config_file
+        puts "Could not find file: #{config_file}"
         exit
       end
 
