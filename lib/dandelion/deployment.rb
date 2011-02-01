@@ -34,23 +34,39 @@ module Deployment
     end
     
     def deploy
-      if remote_revision != local_revision
-        @diff.changed.each do |file|
-          unless @exclude.include?(file)
-            puts "Uploading file: #{file}"
-            @service.write(file, @tree.show(file))
-          end
-        end
-        @diff.deleted.each do |file|
-          unless @exclude.include?(file)
-            puts "Deleting file: #{file}"
-            @service.delete(file)
-          end
-        end
+      if remote_revision != local_revision && any?
+        deploy_changed
+        deploy_deleted
         write_revision
       else
         puts "Nothing to deploy"
       end
+    end
+    
+    def deploy_changed
+      @diff.changed.each do |file|
+        if @exclude.include?(file)
+          puts "Skipping file: #{file}"
+        else
+          puts "Uploading file: #{file}"
+          @service.write(file, @tree.show(file))
+        end
+      end
+    end
+    
+    def deploy_deleted
+      @diff.deleted.each do |file|
+        if @exclude.include?(file)
+          puts "Skipping file: #{file}"
+        else
+          puts "Deleting file: #{file}"
+          @service.delete(file)
+        end
+      end
+    end
+    
+    def any?
+      @diff.changed.any? || @diff.deleted.any?
     end
     
     private
