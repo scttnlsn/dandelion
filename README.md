@@ -15,8 +15,9 @@ Alternatively, you can build the gem yourself:
     
 Usage
 -----
-In the root of the Git repository you wish to deploy, create a `deploy.yml`
-file:
+Deployment options are specified in a YAML file.  By default, Dandelion looks for
+one named `dandelion.yml`, however, this can be overridden by passing a path as an
+argument.
 
     scheme: sftp
     host: example.com
@@ -26,9 +27,9 @@ file:
     
     exclude:
       - .gitignore
-      - deploy.yml
+      - dandelion.yml
       
-Then, to deploy the HEAD revision of the repository, run:
+To deploy the HEAD revision, ensure you are in the root of the repository and run:
 
     $ dandelion
     
