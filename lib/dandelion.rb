@@ -21,7 +21,7 @@ module Dandelion
         exit
       end
 
-      config = YAML.load_file 'deploy.yml'
+      config = YAML.load_file config_file
 
       if config['scheme'] == 'sftp'
         service = Service::SFTP.new(config['host'], config['username'], config['password'], config['path'])
