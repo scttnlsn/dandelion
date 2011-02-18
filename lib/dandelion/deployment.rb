@@ -1,8 +1,6 @@
 require 'dandelion/git'
 
 module Deployment
-  class RemoteRevisionError < StandardError; end
-  
   class Deployment
     def initialize(dir, service, exclude = nil, revision = 'HEAD')
       @service = service
@@ -62,11 +60,7 @@ module Deployment
           puts "Skipping file: #{file}"
         else
           puts "Deleting file: #{file}"
-          begin
-            @service.delete(file)
-          rescue Net::SFTP::StatusException => e
-            raise unless e.code == 2
-          end
+          @service.delete(file)
         end
       end
     end
@@ -82,12 +76,7 @@ module Deployment
     private
     
     def read_revision
-      begin
-        @service.read('.revision').chomp
-      rescue Net::SFTP::StatusException => e
-        raise unless e.code == 2
-        raise RemoteRevisionError
-      end
+      @service.read('.revision').chomp
     end
   end
   

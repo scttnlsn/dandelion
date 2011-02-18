@@ -40,7 +40,7 @@ module Dandelion
         puts "Local revision:   #{deployment.local_revision}"
 
         deployment.deploy
-      rescue Deployment::RemoteRevisionError
+      rescue Service::RemoteRevisionError
         # No remote revision, deploy everything
         deployment = Deployment::FullDeployment.new('.', service, config['exclude'])
 

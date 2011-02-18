@@ -2,6 +2,8 @@ require 'net/sftp'
 require 'tempfile'
 
 module Service
+  class RemoteRevisionError < StandardError; end
+  
   class Service
     def initialize(host, username, path)
       @host = host
@@ -22,8 +24,13 @@ module Service
     end
     
     def read(file)
-      @sftp.file.open(File.join(@path, file), 'r') do |f|
-        f.gets
+      begin
+        @sftp.file.open(File.join(@path, file), 'r') do |f|
+          f.gets
+        end
+      rescue Net::SFTP::StatusException => e
+        raise unless e.code == 2
+        raise RemoteRevisionError
       end
     end
     
@@ -44,9 +51,13 @@ module Service
     end
     
     def delete(file)
-      path = File.join(@path, file)
-      @sftp.remove!(path)
-      cleanup(File.dirname(path))
+      begin
+        path = File.join(@path, file)
+        @sftp.remove!(path)
+        cleanup(File.dirname(path))
+      rescue Net::SFTP::StatusException => e
+        raise unless e.code == 2
+      end
     end
     
     private
