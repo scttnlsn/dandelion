@@ -62,7 +62,11 @@ module Deployment
           puts "Skipping file: #{file}"
         else
           puts "Deleting file: #{file}"
-          @service.delete(file)
+          begin
+            @service.delete(file)
+          rescue Net::SFTP::StatusException => e
+            raise unless e.code == 2
+          end
         end
       end
     end
