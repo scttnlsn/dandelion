@@ -1,12 +1,15 @@
 require 'grit'
 
 module Git
+  class DiffError < StandardError; end
+  
   class Diff
     attr_reader :revision
   
     def initialize(dir, revision)
       @revision = revision
       @raw = `cd #{dir}; git diff --name-status #{@revision} HEAD`
+      check_state!
     end
 
     def changed
@@ -26,6 +29,12 @@ module Git
         items << file if statuses.include? status
       end
       items
+    end
+    
+    def check_state!
+      if $?.exitstatus != 0
+        raise DiffError
+      end
     end
   end
 

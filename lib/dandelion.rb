@@ -33,24 +33,29 @@ module Dandelion
       puts "Connecting to:    #{service.uri}"
 
       begin
-        # Deploy changes since remote revision
-        deployment = Deployment::DiffDeployment.new('.', service, config['exclude'])
+        begin
+          # Deploy changes since remote revision
+          deployment = Deployment::DiffDeployment.new('.', service, config['exclude'])
 
-        puts "Remote revision:  #{deployment.remote_revision}"
-        puts "Local revision:   #{deployment.local_revision}"
+          puts "Remote revision:  #{deployment.remote_revision}"
+          puts "Local revision:   #{deployment.local_revision}"
 
-        deployment.deploy
-      rescue Service::RemoteRevisionError
-        # No remote revision, deploy everything
-        deployment = Deployment::FullDeployment.new('.', service, config['exclude'])
+          deployment.deploy
+        rescue Service::RemoteRevisionError
+          # No remote revision, deploy everything
+          deployment = Deployment::FullDeployment.new('.', service, config['exclude'])
 
-        puts "Remote revision:  ---"
-        puts "Local revision:   #{deployment.local_revision}"
+          puts "Remote revision:  ---"
+          puts "Local revision:   #{deployment.local_revision}"
 
-        deployment.deploy
+          deployment.deploy
+        end
+        
+        puts "Deployment complete"
+      rescue Git::DiffError
+        puts "Failed to deploy"
+        puts "Try merging remote changes before deploying again"
       end
-
-      puts "Deployment complete"
     end
   end
 end
