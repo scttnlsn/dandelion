@@ -19,6 +19,12 @@ module Deployment
     def write_revision
       @service.write('.revision', local_revision)
     end
+    
+    protected
+    
+    def exclude_file?(file)
+      return @exclude.map { |e| file.start_with?(e) }.any?
+    end
   end
   
   class DiffDeployment < Deployment
@@ -45,7 +51,7 @@ module Deployment
     
     def deploy_changed
       @diff.changed.each do |file|
-        if @exclude.include?(file)
+        if exclude_file?(file)
           puts "Skipping file: #{file}"
         else
           puts "Uploading file: #{file}"
@@ -56,7 +62,7 @@ module Deployment
     
     def deploy_deleted
       @diff.deleted.each do |file|
-        if @exclude.include?(file)
+        if exclude_file?(file)
           puts "Skipping file: #{file}"
         else
           puts "Deleting file: #{file}"
@@ -83,7 +89,7 @@ module Deployment
   class FullDeployment < Deployment
     def deploy
       @tree.files.each do |file|
-        unless @exclude.include?(file)
+        unless exclude_file?(file)
           puts "Uploading file: #{file}"
           @service.write(file, @tree.show(file))
         end
