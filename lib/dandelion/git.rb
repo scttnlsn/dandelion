@@ -53,7 +53,7 @@ module Git
     end
     
     def files
-      `cd #{@dir}; git ls-tree --name-only -r #{revision}`.split("\n")
+      @repo.git.native(:ls_tree, {:name_only => true, :raise => true}, revision).split("\n")
     end
 
     def show(file)
