@@ -3,45 +3,52 @@ require 'grit'
 module Git
   class DiffError < StandardError; end
   
-  class Diff
+  class Git
+    def initialize(dir)
+      @dir = dir
+      @repo = Grit::Repo.new(dir)
+    end
+  end
+  
+  class Diff < Git
     attr_reader :revision
+    
+    @files = nil
   
     def initialize(dir, revision)
+      super(dir)
       @revision = revision
-      @raw = `cd #{dir}; git diff --name-status #{@revision} HEAD`
-      check_state!
-    end
-
-    def changed
-      files_flagged ['A', 'C', 'M']
-    end
-
-    def deleted
-      files_flagged ['D']
-    end
-
-    private
-
-    def files_flagged(statuses)
-      items = []
-      @raw.split("\n").each do |line|
-        status, file = line.split("\t")
-        items << file if statuses.include? status
-      end
-      items
-    end
-    
-    def check_state!
-      if $?.exitstatus != 0
+      begin
+        @files = parse_diff @repo.git.native(:diff, {:name_status => true, :raise => true}, revision, 'HEAD')
+      rescue Grit::Git::CommandFailed
         raise DiffError
       end
     end
+
+    def changed
+      @files.select { |file, status| ['A', 'C', 'M'].include?(status) }.keys
+    end
+
+    def deleted
+      @files.select { |file, status| 'D' == status }.keys
+    end
+
+    private
+    
+    def parse_diff(diff)
+      files = {}
+      diff.split("\n").each do |line|
+        status, file = line.split("\t")
+        files[file] = status
+      end
+      files
+    end
   end
 
-  class Tree
+  class Tree < Git
     def initialize(dir, revision)
-      @dir = dir
-      @commit = Grit::Repo.new(dir).commit(revision)
+      super(dir)
+      @commit = @repo.commit(revision)
       @tree = @commit.tree
     end
     
