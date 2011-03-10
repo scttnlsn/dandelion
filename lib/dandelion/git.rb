@@ -11,15 +11,16 @@ module Git
   end
   
   class Diff < Git
-    attr_reader :revision
+    attr_reader :from_revision, :to_revision
     
     @files = nil
   
-    def initialize(dir, revision)
+    def initialize(dir, from_revision, to_revision)
       super(dir)
-      @revision = revision
+      @from_revision = from_revision
+      @to_revision = to_revision
       begin
-        @files = parse_diff @repo.git.native(:diff, {:name_status => true, :raise => true}, revision, 'HEAD')
+        @files = parse_diff @repo.git.native(:diff, {:name_status => true, :raise => true}, from_revision, to_revision)
       rescue Grit::Git::CommandFailed
         raise DiffError
       end

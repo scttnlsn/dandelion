@@ -30,11 +30,11 @@ module Deployment
   class DiffDeployment < Deployment
     def initialize(dir, service, exclude = nil, revision = 'HEAD')
       super(dir, service, exclude, revision)
-      @diff = Git::Diff.new(dir, read_revision)
+      @diff = Git::Diff.new(dir, read_remote_revision, revision)
     end
     
     def remote_revision
-      @diff.revision
+      @diff.from_revision
     end
     
     def deploy
@@ -81,7 +81,7 @@ module Deployment
     
     private
     
-    def read_revision
+    def read_remote_revision
       @service.read('.revision').chomp
     end
   end
