@@ -54,7 +54,7 @@ module Dandelion
       end
     
       def files
-        @repo.git.native(:ls_tree, {:name_only => true}, revision).split("\n")
+        @repo.git.native(:ls_tree, {:name_only => true, :r => true}, revision).split("\n")
       end
 
       def show(file)
