@@ -2,6 +2,6 @@
 
 $:.unshift(File.dirname(__FILE__) + '/../lib') unless $:.include?(File.dirname(__FILE__) + '/../lib')
 
-require 'dandelion'
+require 'dandelion/cli'
 
-Dandelion.run
+Dandelion::Cli::Main.execute(ARGV.dup)

@@ -1,68 +1,69 @@
 require 'grit'
 
-module Git
-  class DiffError < StandardError; end
+module Dandelion
+  module Git
+    class DiffError < StandardError; end
   
-  class Git
-    def initialize(dir)
-      @dir = dir
-      @repo = Grit::Repo.new(dir)
+    class Repo < Grit::Repo
+      def initialize(dir)
+        super(dir)
+      end
     end
-  end
   
-  class Diff < Git
-    attr_reader :from_revision, :to_revision
+    class Diff
+      attr_reader :from_revision, :to_revision
     
-    @files = nil
+      @files = nil
   
-    def initialize(dir, from_revision, to_revision)
-      super(dir)
-      @from_revision = from_revision
-      @to_revision = to_revision
-      begin
-        @files = parse_diff @repo.git.native(:diff, {:name_status => true, :raise => true}, from_revision, to_revision)
-      rescue Grit::Git::CommandFailed
-        raise DiffError
+      def initialize(repo, from_revision, to_revision)
+        @repo = repo
+        @from_revision = from_revision
+        @to_revision = to_revision
+        begin
+          @files = parse_diff @repo.git.native(:diff, {:name_status => true, :raise => true}, from_revision, to_revision)
+        rescue Grit::Git::CommandFailed
+          raise DiffError
+        end
+      end
+
+      def changed
+        @files.select { |file, status| ['A', 'C', 'M'].include?(status) }.keys
+      end
+
+      def deleted
+        @files.select { |file, status| 'D' == status }.keys
+      end
+
+      private
+    
+      def parse_diff(diff)
+        files = {}
+        diff.split("\n").each do |line|
+          status, file = line.split("\t")
+          files[file] = status
+        end
+        files
       end
     end
 
-    def changed
-      @files.select { |file, status| ['A', 'C', 'M'].include?(status) }.keys
-    end
-
-    def deleted
-      @files.select { |file, status| 'D' == status }.keys
-    end
-
-    private
-    
-    def parse_diff(diff)
-      files = {}
-      diff.split("\n").each do |line|
-        status, file = line.split("\t")
-        files[file] = status
+    class Tree
+      def initialize(repo, revision)
+        @repo = repo
+        @commit = @repo.commit(revision)
+        @tree = @commit.tree
       end
-      files
-    end
-  end
-
-  class Tree < Git
-    def initialize(dir, revision)
-      super(dir)
-      @commit = @repo.commit(revision)
-      @tree = @commit.tree
-    end
     
-    def files
-      @repo.git.native(:ls_tree, {:name_only => true, :raise => true}, revision).split("\n")
-    end
+      def files
+        @repo.git.native(:ls_tree, {:name_only => true}, revision).split("\n")
+      end
 
-    def show(file)
-      (@tree / file).data
-    end
+      def show(file)
+        (@tree / file).data
+      end
   
-    def revision
-      @commit.sha
+      def revision
+        @commit.sha
+      end
     end
   end
 end
