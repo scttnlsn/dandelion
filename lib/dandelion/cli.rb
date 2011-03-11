@@ -118,6 +118,19 @@ module Dandelion
           log.fatal('Try merging remote changes before running dandelion again')
           exit
         end
+        
+        begin
+          repo.remote_list.each do |remote|
+            deployment.validate_state(remote)
+          end
+        rescue Deployment::FastForwardError
+          if !@options[:force] and !@options[:status]
+            log.warn('Warning: you are trying to deploy unpushed commits')
+            log.warn('This could potentially prevent others from being able to deploy')
+            log.warn('If you are sure you want to this, use the -f option to force deployment')
+            exit
+          end
+        end
 
         remote_revision = deployment.remote_revision || '---'
         local_revision = deployment.local_revision

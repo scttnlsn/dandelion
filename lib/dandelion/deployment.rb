@@ -29,6 +29,12 @@ module Dandelion
         @service.write('.revision', local_revision)
       end
       
+      def validate_state(remote = nil)
+        if remote and @repo.git.native(:remote, {:raise => true}, 'show', remote) =~ /fast-forward/i
+          raise FastForwardError
+        end
+      end
+      
       def log
         Dandelion.logger
       end
