@@ -13,26 +13,42 @@ Alternatively, you can build the gem yourself:
     $ cd dandelion
     $ rake install
     
-Usage
------
-Deployment options are specified in a YAML file.  By default, Dandelion looks for
-one named `dandelion.yml`, however, this can be overridden by passing a path as an
-argument.
+Config
+------
+Configuration options are specified in a YAML file (Dandelion looks for a file
+named `dandelion.yml` by default):
 
+    # Required
     scheme: sftp
     host: example.com
     username: user
     password: pass
     path: path/to/deployment
     
+    # Optional
     exclude:
-      - .gitignore
-      - dandelion.yml
-      
-To deploy the HEAD revision, ensure you are in the root of the repository and run:
+        - .gitignore
+        - dandelion.yml
+    
+Usage
+-----
+From the root directory of a Git repository, run:
 
     $ dandelion
     
-If the repository has previously been deployed then only the files that have
-changed since the last deployment will be transferred.  All files (except those
-excluded) will be transferred on first deployment.
+Or:
+
+    $ dandelion path/to/config.yml
+    
+This will deploy the local `HEAD` revision to the server specified in the config
+file.  Dandelion keeps track of the most recently deployed revision so that only
+files which have changed since the last deployment need to be transferred.
+
+For a more complete summary of usage options, run:
+
+    $ dandelion -h
+    Usage: dandelion [options] [config_file]
+        -f, --force                      Force deployment
+        -s, --status                     Display revision status
+        -v, --version                    Display the current version
+        -h, --help                       Display this screen
