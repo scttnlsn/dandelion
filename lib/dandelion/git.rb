@@ -27,11 +27,11 @@ module Dandelion
       end
 
       def changed
-        @files.select { |file, status| ['A', 'C', 'M'].include?(status) }.keys
+        @files.to_a.select { |f| ['A', 'C', 'M'].include?(f.last) }.map { |f| f.first }
       end
 
       def deleted
-        @files.select { |file, status| 'D' == status }.keys
+        @files.to_a.select { |f| 'D' == f.last }.map { |f| f.first }
       end
 
       private
