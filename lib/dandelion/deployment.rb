@@ -56,7 +56,7 @@ module Dandelion
         @diff.from_revision
       end
     
-      def deploy
+      def deploy!
         if !revisions_match? && any?
           deploy_changed
           deploy_deleted

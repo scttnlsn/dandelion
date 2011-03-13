@@ -113,7 +113,7 @@ class TestDiffDeployment < Test::Unit::TestCase
   end
   
   def test_diff_deployment_deploy
-    @diff_deployment.deploy
+    @diff_deployment.deploy!
     assert_equal 3, @service.writes.length
     assert_equal 'bar', @service.writes['foo']
     assert_equal 'bar', @service.writes['baz/foo']

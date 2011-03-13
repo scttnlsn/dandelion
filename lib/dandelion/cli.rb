@@ -142,7 +142,7 @@ module Dandelion
           exit
         end
 
-        deployment.deploy
+        deployment.deploy!
         log.info("Deployment complete")
       end
     end
