@@ -35,6 +35,11 @@ module Dandelion
             puts opts
             exit
           end
+          
+          @options[:repo] = '.'
+          opts.on('--repo=[REPO]', 'Use the given repository') do |repo|
+            @options[:repo] = repo
+          end
         end
       end
       
@@ -76,12 +81,17 @@ module Dandelion
         Dandelion.logger
       end
       
+      def path_for(file)
+        File.expand_path File.join(@options[:repo], file)
+      end
+      
       def check_files!
-        unless File.exists? '.git'
-          log.fatal('Not a git repository: .git')
+        repo = path_for '.git'
+        unless File.exists? repo
+          log.fatal("Not a git repository: #{repo}")
           exit
         end
-        unless File.exists? @options.config_file
+        unless File.exists?(path_for @options.config_file)
           log.fatal("Could not find file: #{@options.config_file}")
           exit
         end
@@ -97,7 +107,7 @@ module Dandelion
       
       def execute!
         check_files!
-        config = YAML.load_file @options.config_file
+        config = YAML.load_file(path_for @options.config_file)
 
         begin
           service = service config
@@ -107,7 +117,7 @@ module Dandelion
         end
 
         log.info("Connecting to:    #{service.uri}")
-        repo = Git::Repo.new('.')
+        repo = Git::Repo.new(File.expand_path @options[:repo])
 
         begin
           deployment = Deployment::DiffDeployment.new(repo, service, config['exclude'])
