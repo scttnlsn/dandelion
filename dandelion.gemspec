@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Scott Nelson']
   s.email       = ['scottbnel@gmail.com']
-  s.homepage    = 'http://github.com/scottbnel/dandelion'
+  s.homepage    = 'http://github.com/scttnlsn/dandelion'
   s.summary     = "dandelion-#{s.version}"
   s.description = 'Git repository deployment via SFTP'
   
