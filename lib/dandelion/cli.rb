@@ -100,6 +100,8 @@ module Dandelion
       def service(config)
         if config['scheme'] == 'sftp'
           Service::SFTP.new(config['host'], config['username'], config['password'], config['path'])
+        elsif config['scheme'] == 'ftp'
+          Service::FTP.new(config['host'], config['username'], config['password'], config['path'])
         else
           raise UnsupportedSchemeError
         end

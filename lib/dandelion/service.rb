@@ -1,3 +1,4 @@
+require 'net/ftp'
 require 'net/sftp'
 require 'tempfile'
 
@@ -14,6 +15,82 @@ module Dandelion
     
       def uri
         "#{@scheme}://#{@username}@#{@host}/#{@path}"
+      end
+      
+      protected
+      
+      def temp(file, data)
+        tmp = Tempfile.new(file.gsub('/', '.'))
+        tmp << data
+        tmp.flush
+        yield(tmp.path)
+        tmp.close
+      end
+    end
+    
+    class FTP < Service
+      def initialize(host, username, password, path)
+        super(host, username, path)
+        @scheme = 'ftp'
+        @ftp = Net::FTP.open(host, username, password)
+        @ftp.passive = true
+        @ftp.chdir(path)
+      end
+      
+      def read(file)
+        begin
+          content = ''
+          @ftp.getbinaryfile(file, localfile = nil) do |data|
+            content += data
+          end
+          content
+        rescue Net::FTPPermError => e
+          raise MissingFileError
+        end
+      end
+      
+      def write(file, data)
+        begin
+          dir = File.dirname(file)
+          @ftp.list(dir)
+        rescue Net::FTPTempError => e
+          mkdir_p(dir)
+        end
+        temp(file, data) do |temp|
+          @ftp.putbinaryfile(temp, file)
+        end
+      end
+      
+      def delete(file)
+        begin
+          @ftp.delete(file)
+          cleanup(File.dirname(file))
+        rescue Net::FTPPermError => e
+        end
+      end
+      
+      private
+      
+      def cleanup(dir)
+        unless File.identical?(dir, @path)
+          if empty?(dir)
+            @ftp.rmdir(dir)
+            cleanup(File.dirname(dir))
+          end
+        end
+      end
+    
+      def empty?(dir)
+        return @ftp.nlst(dir).empty?
+      end
+    
+      def mkdir_p(dir)
+        begin
+          @ftp.mkdir(dir)
+        rescue Net::FTPPermError => e
+          mkdir_p(File.dirname(dir))
+          mkdir_p(dir)
+        end
       end
     end
   
@@ -44,11 +121,9 @@ module Dandelion
           raise unless e.code == 2
           mkdir_p(dir)
         end
-        tmp = Tempfile.new(file.gsub('/', '.'))
-        tmp << data
-        tmp.flush
-        @sftp.upload!(tmp.path, path)
-        tmp.close
+        temp(file, data) do |temp|
+          @sftp.upload!(temp, path)
+        end
       end
     
       def delete(file)
