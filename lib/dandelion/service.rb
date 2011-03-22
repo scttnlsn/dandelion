@@ -40,7 +40,7 @@ module Dandelion
       def read(file)
         begin
           content = ''
-          @ftp.getbinaryfile(file) do |data|
+          @ftp.getbinaryfile(file, localfile = nil) do |data|
             content += data
           end
           content
