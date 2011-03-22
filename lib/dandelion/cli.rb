@@ -154,11 +154,7 @@ module Dandelion
           exit
         end
 
-        if deployment.class == Deployment::FullDeployment
-          deployment.deploy
-        else
-          deployment.deploy!
-        end
+        deployment.deploy!
         
         log.info("Deployment complete")
       end

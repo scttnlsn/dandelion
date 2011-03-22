@@ -110,7 +110,7 @@ module Dandelion
     end
   
     class FullDeployment < Deployment
-      def deploy
+      def deploy!
         @tree.files.each do |file|
           if exclude_file?(file)
             log.info("Skipping file: #{file}")
