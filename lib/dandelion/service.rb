@@ -5,20 +5,20 @@ require 'tempfile'
 module Dandelion
   module Service
     class MissingFileError < StandardError; end
-  
+
     class Service
       def initialize(host, username, path)
         @host = host
         @username = username
         @path = path
       end
-    
+
       def uri
         "#{@scheme}://#{@username}@#{@host}/#{@path}"
       end
-      
+
       protected
-      
+
       def temp(file, data)
         tmp = Tempfile.new(file.gsub('/', '.'))
         tmp << data
@@ -27,7 +27,7 @@ module Dandelion
         tmp.close
       end
     end
-    
+
     class FTP < Service
       def initialize(host, username, password, path)
         super(host, username, path)
@@ -36,11 +36,11 @@ module Dandelion
         @ftp.passive = true
         @ftp.chdir(path)
       end
-      
+
       def read(file)
         begin
           content = ''
-          @ftp.getbinaryfile(file, localfile = nil) do |data|
+          @ftp.getbinaryfile(file) do |data|
             content += data
           end
           content
@@ -48,7 +48,7 @@ module Dandelion
           raise MissingFileError
         end
       end
-      
+
       def write(file, data)
         begin
           dir = File.dirname(file)
@@ -60,7 +60,7 @@ module Dandelion
           @ftp.putbinaryfile(temp, file)
         end
       end
-      
+
       def delete(file)
         begin
           @ftp.delete(file)
@@ -68,9 +68,9 @@ module Dandelion
         rescue Net::FTPPermError => e
         end
       end
-      
+
       private
-      
+
       def cleanup(dir)
         unless File.identical?(dir, @path)
           if empty?(dir)
@@ -79,11 +79,11 @@ module Dandelion
           end
         end
       end
-    
+
       def empty?(dir)
         return @ftp.nlst(dir).empty?
       end
-    
+
       def mkdir_p(dir)
         begin
           @ftp.mkdir(dir)
@@ -93,14 +93,14 @@ module Dandelion
         end
       end
     end
-  
+
     class SFTP < Service
       def initialize(host, username, password, path)
         super(host, username, path)
         @scheme = 'sftp'
         @sftp = Net::SFTP.start(host, username, :password => password)
       end
-    
+
       def read(file)
         begin
           @sftp.file.open(File.join(@path, file), 'r') do |f|
@@ -111,7 +111,7 @@ module Dandelion
           raise MissingFileError
         end
       end
-    
+
       def write(file, data)
         path = File.join(@path, file)
         begin
@@ -125,7 +125,7 @@ module Dandelion
           @sftp.upload!(temp, path)
         end
       end
-    
+
       def delete(file)
         begin
           path = File.join(@path, file)
@@ -135,9 +135,9 @@ module Dandelion
           raise unless e.code == 2
         end
       end
-    
+
       private
-    
+
       def cleanup(dir)
         unless File.identical?(dir, @path)
           if empty?(dir)
@@ -146,13 +146,13 @@ module Dandelion
           end
         end
       end
-    
+
       def empty?(dir)
         @sftp.dir.entries(dir).map do |entry|
           entry.name unless entry.name == '.' or entry.name == '..'
         end.compact.empty?
       end
-    
+
       def mkdir_p(dir)
         begin
           @sftp.mkdir!(dir)
