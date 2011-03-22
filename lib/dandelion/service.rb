@@ -39,11 +39,7 @@ module Dandelion
 
       def read(file)
         begin
-          content = ''
-          @ftp.getbinaryfile(file, localfile = nil) do |data|
-            content += data
-          end
-          content
+          @ftp.getbinaryfile(file, localfile = nil)
         rescue Net::FTPPermError => e
           raise MissingFileError
         end
