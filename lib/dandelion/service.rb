@@ -50,12 +50,9 @@ module Dandelion
       end
 
       def write(file, data)
-        begin
-          dir = File.dirname(file)
-          @ftp.list(dir)
-        rescue Net::FTPTempError => e
-          mkdir_p(dir)
-        end
+        # Creates directory only if necessary
+        mkdir_p(File.dirname(file))
+
         temp(file, data) do |temp|
           @ftp.putbinaryfile(temp, file)
         end
@@ -85,12 +82,14 @@ module Dandelion
       end
 
       def mkdir_p(dir)
-        begin
+        return if dir == "."
+        parent_dir = File.dirname(dir)
+        file_names = @ftp.nlst(parent_dir)
+        unless file_names.include? dir
+          mkdir_p(parent_dir)
           @ftp.mkdir(dir)
-        rescue Net::FTPPermError => e
-          mkdir_p(File.dirname(dir))
-          mkdir_p(dir)
         end
+
       end
     end
 
