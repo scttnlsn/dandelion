@@ -9,7 +9,7 @@ Ensure that Ruby and RubyGems are installed, then run:
     
 Alternatively, you can build the gem yourself:
 
-    $ git clone git://github.com/scottbnel/dandelion.git
+    $ git clone git://github.com/scttnlsn/dandelion.git
     $ cd dandelion
     $ rake install
     
