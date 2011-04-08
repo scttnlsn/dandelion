@@ -45,7 +45,13 @@ module Dandelion
       
       def parse!(args)
         @args = args
-        @optparse.parse!(@args)
+        begin
+          @optparse.parse!(@args)
+        rescue OptionParser::InvalidOption => e
+          puts e.to_s.capitalize
+          puts @optparse.help
+          exit
+        end
       end
       
       def config_file
