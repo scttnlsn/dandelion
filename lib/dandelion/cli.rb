@@ -8,23 +8,46 @@ require 'yaml'
 
 module Dandelion
   module Cli
-    class UnsupportedSchemeError < StandardError; end
-    
     class Options
+      attr_reader :config_file
+      
       def initialize
         @options = {}
-        @optparse = OptionParser.new do |opts|
-          opts.banner = 'Usage: dandelion [options] [config_file]'
+        @config_file = 'dandelion.yml'
+        @global = global_parser
+        @commands = { 'deploy' => deploy_parser, 'status' => status_parser }
+      end
+      
+      def parse(args)
+        order @global, args
+        command = args.shift
+        if command and @commands[command]
+          order @commands[command], args
+        end
+        
+        if @commands.key? command
+          @config_file = args.shift.strip if args[0]
+          command
+        else
+          puts "Invalid command: #{command}"
+          puts @global.help
+          exit
+        end
+      end
+      
+      def [](key)
+        @options[key]
+      end
 
-          @options[:force] = false
-          opts.on('-f', '--force', 'Force deployment') do
-            @options[:force] = true
-          end
-
-          @options[:status] = false
-          opts.on('-s', '--status', 'Display revision status') do
-            @options[:status] = true;
-          end
+      def []=(key, value)
+        @options[key] = value
+      end
+      
+      private
+      
+      def global_parser
+        OptionParser.new do |opts|
+          opts.banner = 'Usage: dandelion [options] [[command] [options]]'
 
           opts.on('-v', '--version', 'Display the current version') do
             puts "Dandelion v#{Dandelion::VERSION}"
@@ -43,126 +66,124 @@ module Dandelion
         end
       end
       
-      def parse!(args)
-        @args = args
+      def deploy_parser
+        OptionParser.new do |opts|
+          opts.banner = 'Usage: dandelion deploy [options]'
+          
+          @options[:force] = false
+          opts.on('-f', '--force', 'Force deployment') do
+            @options[:force] = true
+          end
+        end
+      end
+      
+      def status_parser
+        OptionParser.new do |opts|
+          opts.banner = 'Usage: dandelion status'
+        end
+      end
+      
+      def order(parser, args)
         begin
-          @optparse.parse!(@args)
+          parser.order!(args)
         rescue OptionParser::InvalidOption => e
           puts e.to_s.capitalize
-          puts @optparse.help
+          puts parser.help
           exit
         end
-      end
-      
-      def config_file
-        if @args[0]
-          @args[0].strip
-        else
-          'dandelion.yml'
-        end
-      end
-      
-      def [](key)
-        @options[key]
-      end
-
-      def []=(key, value)
-        @options[key] = value
       end
     end
     
     class Main
       class << self
         def execute(args)
-          new(args).execute!
+          new(args).execute
         end
       end
       
       def initialize(args)
         @options = Options.new
-        @options.parse!(args)
+        @command = @options.parse args
+        
+        validate_files
+        @config = YAML.load_file(File.expand_path @options.config_file)
+        @repo = Git::Repo.new(File.expand_path @options[:repo])
       end
       
       def log
         Dandelion.logger
       end
       
-      def path_for(file)
-        File.expand_path File.join(@options[:repo], file)
-      end
-      
-      def check_files!
-        repo = path_for '.git'
-        unless File.exists? repo
-          log.fatal("Not a git repository: #{repo}")
-          exit
-        end
-        unless File.exists?(path_for @options.config_file)
-          log.fatal("Could not find file: #{@options.config_file}")
-          exit
-        end
-      end
-
-      def service(config)
-        if config['scheme'] == 'sftp'
-          Service::SFTP.new(config['host'], config['username'], config['password'], config['path'])
-        elsif config['scheme'] == 'ftp'
-          Service::FTP.new(config['host'], config['username'], config['password'], config['path'])
-        else
-          raise UnsupportedSchemeError
-        end
-      end
-      
-      def execute!
-        check_files!
-        config = YAML.load_file(path_for @options.config_file)
-
-        begin
-          service = service config
-        rescue UnsupportedSchemeError
-          log.fatal("Unsupported scheme: #{config['scheme']}")
-          exit
-        end
-
+      def execute
         log.info("Connecting to:    #{service.uri}")
-        repo = Git::Repo.new(File.expand_path @options[:repo])
-
+        deployment(service) do |d|
+          log.info("Remote revision:  #{d.remote_revision || '---'}")
+          log.info("Local revision:   #{d.local_revision}")
+          
+          if @command == 'status'
+            exit
+          elsif @command == 'deploy'
+            validate_deployment d
+            d.deploy!
+            log.info("Deployment complete")
+          end
+        end
+      end
+      
+      private
+      
+      def deployment(service)
         begin
-          deployment = Deployment::DiffDeployment.new(repo, service, config['exclude'])
+          deployment = Deployment::DiffDeployment.new(@repo, service, @config['exclude'])
         rescue Deployment::RemoteRevisionError
-          deployment = Deployment::FullDeployment.new(repo, service, config['exclude'])
+          deployment = Deployment::FullDeployment.new(@repo, service, @config['exclude'])
         rescue Git::DiffError
           log.fatal('Error: could not generate diff')
           log.fatal('Try merging remote changes before running dandelion again')
           exit
         end
-        
+        if block_given?
+          yield(deployment)
+        else
+          deployment
+        end
+      end
+      
+      def service
+        if @config['scheme'] == 'sftp'
+          Service::SFTP.new(@config['host'], @config['username'], @config['password'], @config['path'])
+        elsif @config['scheme'] == 'ftp'
+          Service::FTP.new(@config['host'], @config['username'], @config['password'], @config['path'])
+        else
+          log.fatal("Unsupported scheme: #{@config['scheme']}")
+          exit
+        end
+      end
+      
+      def validate_deployment(deployment)
         begin
-          repo.remote_list.each do |remote|
+          @repo.remote_list.each do |remote|
             deployment.validate_state(remote)
           end
         rescue Deployment::FastForwardError
-          if !@options[:force] and !@options[:status]
+          if !@options[:force]
             log.warn('Warning: you are trying to deploy unpushed commits')
             log.warn('This could potentially prevent others from being able to deploy')
             log.warn('If you are sure you want to this, use the -f option to force deployment')
             exit
           end
         end
-
-        remote_revision = deployment.remote_revision || '---'
-        local_revision = deployment.local_revision
-
-        log.info("Remote revision:  #{remote_revision}")
-        log.info("Local revision:   #{local_revision}")
-
-        if @options[:status]
+      end
+      
+      def validate_files
+        unless File.exists? File.expand_path File.join(@options[:repo], '.git')
+          log.fatal("Not a git repository: #{@options[:repo]}")
           exit
         end
-
-        deployment.deploy!
-        
-        log.info("Deployment complete")
+        unless File.exists?(File.expand_path @options.config_file)
+          log.fatal("Could not find file: #{@options.config_file}")
+          exit
+        end
       end
     end
   end
