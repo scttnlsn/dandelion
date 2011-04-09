@@ -56,7 +56,7 @@ module Dandelion
         @diff.from_revision
       end
     
-      def deploy!
+      def deploy
         if !revisions_match? && any?
           deploy_changed
           deploy_deleted
@@ -110,7 +110,7 @@ module Dandelion
     end
   
     class FullDeployment < Deployment
-      def deploy!
+      def deploy
         @tree.files.each do |file|
           if exclude_file?(file)
             log.info("Skipping file: #{file}")

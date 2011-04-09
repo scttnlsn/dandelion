@@ -124,7 +124,7 @@ module Dandelion
             exit
           elsif @command == 'deploy'
             validate_deployment d
-            d.deploy!
+            d.deploy
             log.info("Deployment complete")
           end
         end
