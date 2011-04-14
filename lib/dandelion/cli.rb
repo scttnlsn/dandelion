@@ -33,6 +33,7 @@ module Dandelion
             puts "Invalid command: #{command}"
           end
           puts @global.help
+          puts "\nAvailable commands:\n    #{@commands.keys.join("\n    ")}"
           exit
         end
       end
