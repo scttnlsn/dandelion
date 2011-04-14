@@ -29,7 +29,9 @@ module Dandelion
           @config_file = args.shift.strip if args[0]
           command
         else
-          puts "Invalid command: #{command}"
+          if not @command.nil?
+            puts "Invalid command: #{command}"
+          end
           puts @global.help
           exit
         end
