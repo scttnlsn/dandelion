@@ -30,8 +30,11 @@ module Dandelion
       end
       
       def validate_state(remote = nil)
-        if remote and @repo.git.native(:remote, {:raise => true}, 'show', remote) =~ /fast-forward/i
-          raise FastForwardError
+        begin
+          if remote and @repo.git.native(:remote, {:raise => true}, 'show', remote) =~ /fast-forward/i
+            raise FastForwardError
+          end
+        rescue Grit::Git::CommandFailed
         end
       end
       
