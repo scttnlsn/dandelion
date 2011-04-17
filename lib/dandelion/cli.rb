@@ -16,6 +16,7 @@ module Dandelion
         @config_file = 'dandelion.yml'
         @global = global_parser
         @commands = { 'deploy' => deploy_parser, 'status' => status_parser }
+        @commands_help = "\nAvailable commands:\n    #{@commands.keys.join("\n    ")}"
       end
       
       def parse(args)
@@ -33,7 +34,7 @@ module Dandelion
             puts "Invalid command: #{command}"
           end
           puts @global.help
-          puts "\nAvailable commands:\n    #{@commands.keys.join("\n    ")}"
+          puts @commands_help
           exit
         end
       end
@@ -59,6 +60,7 @@ module Dandelion
 
           opts.on('-h', '--help', 'Display this screen') do
             puts opts
+            puts @commands_help
             exit
           end
           
