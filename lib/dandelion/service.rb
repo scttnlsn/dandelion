@@ -39,7 +39,13 @@ module Dandelion
 
       def read(file)
         begin
-          @ftp.getbinaryfile(file, localfile = nil)
+          # Implementation of FTP#getbinaryfile differs between 1.8
+          # and 1.9 so we call FTP#retrbinary directly
+          content = ''
+          @ftp.retrbinary("RETR #{file}", 4096) do |data|
+            content += data
+          end
+          content
         rescue Net::FTPPermError => e
           raise MissingFileError
         end
