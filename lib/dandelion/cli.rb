@@ -159,6 +159,8 @@ module Dandelion
           Service::SFTP.new(@config['host'], @config['username'], @config['password'], @config['path'])
         elsif @config['scheme'] == 'ftp'
           Service::FTP.new(@config['host'], @config['username'], @config['password'], @config['path'])
+        elsif @config['scheme'] == 's3'
+          Service::S3.new(@config['access_key_id'], @config['secret_access_key'], @config['bucket'], @config['path'])
         else
           log.fatal("Unsupported scheme: #{@config['scheme']}")
           exit
