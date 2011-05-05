@@ -1,7 +1,4 @@
-require 'net/ftp'
-require 'net/sftp'
 require 'tempfile'
-require 'aws/s3'
 
 module Dandelion
   module Service
@@ -31,6 +28,7 @@ module Dandelion
 
     class FTP < Service
       def initialize(host, username, password, path)
+        require 'net/ftp'
         super(host, username, path)
         @scheme = 'ftp'
         @ftp = Net::FTP.open(host, username, password)
@@ -98,6 +96,7 @@ module Dandelion
 
     class SFTP < Service
       def initialize(host, username, password, path)
+        require 'net/sftp'
         super(host, username, path)
         @scheme = 'sftp'
         @sftp = Net::SFTP.start(host, username, :password => password)
@@ -168,6 +167,7 @@ module Dandelion
     
     class S3 < Service
       def initialize(access_key_id, secret_access_key, bucket_name, prefix)
+        require 'aws/s3'
         super('Amazon S3', access_key_id, prefix)
         @scheme = 's3'
         @access_key_id = access_key_id
