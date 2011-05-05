@@ -12,7 +12,6 @@ Gem::Specification.new do |s|
   s.summary     = "dandelion-#{s.version}"
   s.description = 'Git repository deployment via FTP/SFTP'
   
-  s.add_dependency 'net-sftp', '>= 2.0.5'
   s.add_dependency 'grit', '>= 2.4.1'
 
   s.files         = `git ls-files`.split("\n")
