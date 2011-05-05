@@ -156,13 +156,25 @@ module Dandelion
       
       def service
         if @config['scheme'] == 'sftp'
-          Service::SFTP.new(@config['host'], @config['username'], @config['password'], @config['path'])
+          klass = Service::SFTP
+          args = [@config['host'], @config['username'], @config['password'], @config['path']]
         elsif @config['scheme'] == 'ftp'
-          Service::FTP.new(@config['host'], @config['username'], @config['password'], @config['path'])
+          klass = Service::FTP
+          args = [@config['host'], @config['username'], @config['password'], @config['path']]
         elsif @config['scheme'] == 's3'
-          Service::S3.new(@config['access_key_id'], @config['secret_access_key'], @config['bucket'], @config['path'])
+          klass = Service::S3
+          args = [@config['access_key_id'], @config['secret_access_key'], @config['bucket'], @config['path']]
         else
           log.fatal("Unsupported scheme: #{@config['scheme']}")
+          exit
+        end
+        
+        begin
+          klass.new(*args)
+        rescue LoadError
+          log.fatal("The '#{@config['scheme']}' scheme requires additional gems:")
+          log.fatal('    ' + klass.gems.join("\n    ") + "\n")
+          log.fatal("Please install the gems: gem install #{klass.gems.join(' ')}")
           exit
         end
       end

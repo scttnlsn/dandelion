@@ -5,6 +5,12 @@ module Dandelion
     class MissingFileError < StandardError; end
 
     class Service
+      class << self
+        def gems
+          []
+        end
+      end
+      
       def initialize(host, username, path)
         @host = host
         @username = username
@@ -95,6 +101,12 @@ module Dandelion
     end
 
     class SFTP < Service
+      class << self
+        def gems
+          ['net-sftp']
+        end
+      end
+      
       def initialize(host, username, password, path)
         require 'net/sftp'
         super(host, username, path)
@@ -166,6 +178,12 @@ module Dandelion
     end
     
     class S3 < Service
+      class << self
+        def gems
+          ['aws-s3']
+        end
+      end
+      
       def initialize(access_key_id, secret_access_key, bucket_name, prefix)
         require 'aws/s3'
         super('Amazon S3', access_key_id, prefix)
