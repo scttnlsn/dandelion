@@ -1,7 +1,7 @@
 require 'dandelion'
+require 'dandelion/backend'
 require 'dandelion/deployment'
 require 'dandelion/git'
-require 'dandelion/service'
 require 'dandelion/version'
 require 'optparse'
 require 'yaml'
@@ -156,13 +156,16 @@ module Dandelion
       
       def service
         if @config['scheme'] == 'sftp'
-          klass = Service::SFTP
+          require 'dandelion/backend/sftp'
+          klass = Backend::SFTP
           args = [@config['host'], @config['username'], @config['password'], @config['path']]
         elsif @config['scheme'] == 'ftp'
-          klass = Service::FTP
+          require 'dandelion/backend/ftp'
+          klass = Backend::FTP
           args = [@config['host'], @config['username'], @config['password'], @config['path']]
         elsif @config['scheme'] == 's3'
-          klass = Service::S3
+          require 'dandelion/backend/s3'
+          klass = Backend::S3
           args = [@config['access_key_id'], @config['secret_access_key'], @config['bucket'], @config['path']]
         else
           log.fatal("Unsupported scheme: #{@config['scheme']}")
