@@ -1,6 +1,5 @@
 require 'dandelion'
 require 'dandelion/deployment'
-require 'dandelion/service'
 require 'test/unit'
 
 def fixture(name)
@@ -57,7 +56,7 @@ class MockRepo
   end
 end
 
-class MockService
+class MockBackend
   attr_reader :reads, :writes, :deletes
   
   def initialize(remote_revision)
@@ -87,8 +86,8 @@ class TestDiffDeployment < Test::Unit::TestCase
     @head_revision = '0ca605e9f0f1d42ce8193ac36db11ec3cc9efc08'
     @remote_revision = 'ff1f1d4bd0c99e1c9cca047c46b2194accf89504'
     @repo = MockRepo.new
-    @service = MockService.new(@remote_revision)
-    @diff_deployment = Dandelion::Deployment::DiffDeployment.new(@repo, @service, [], @head_revision)
+    @backend = MockBackend.new(@remote_revision)
+    @diff_deployment = Dandelion::Deployment::DiffDeployment.new(@repo, @backend, [], @head_revision)
   end
   
   def test_diff_deployment_local_revision
@@ -101,7 +100,7 @@ class TestDiffDeployment < Test::Unit::TestCase
   
   def test_diff_deployment_write_revision
     @diff_deployment.write_revision
-    assert_equal @head_revision, @service.writes['.revision']
+    assert_equal @head_revision, @backend.writes['.revision']
   end
   
   def test_diff_deployment_revisions_match
@@ -114,10 +113,10 @@ class TestDiffDeployment < Test::Unit::TestCase
   
   def test_diff_deployment_deploy
     @diff_deployment.deploy
-    assert_equal 3, @service.writes.length
-    assert_equal 'bar', @service.writes['foo']
-    assert_equal 'bar', @service.writes['baz/foo']
-    assert_equal @head_revision, @service.writes['.revision']
-    assert_equal ['foobar'], @service.deletes
+    assert_equal 3, @backend.writes.length
+    assert_equal 'bar', @backend.writes['foo']
+    assert_equal 'bar', @backend.writes['baz/foo']
+    assert_equal @head_revision, @backend.writes['.revision']
+    assert_equal ['foobar'], @backend.deletes
   end
 end

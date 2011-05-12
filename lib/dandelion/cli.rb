@@ -120,8 +120,9 @@ module Dandelion
       end
       
       def execute
-        log.info("Connecting to:    #{service.uri}")
-        deployment(service) do |d|
+        backend = build_backend
+        log.info("Connecting to:    #{backend.uri}")
+        deployment(backend) do |d|
           log.info("Remote revision:  #{d.remote_revision || '---'}")
           log.info("Local revision:   #{d.local_revision}")
           
@@ -137,11 +138,11 @@ module Dandelion
       
       private
       
-      def deployment(service)
+      def deployment(backend)
         begin
-          deployment = Deployment::DiffDeployment.new(@repo, service, @config['exclude'])
+          deployment = Deployment::DiffDeployment.new(@repo, backend, @config['exclude'])
         rescue Deployment::RemoteRevisionError
-          deployment = Deployment::FullDeployment.new(@repo, service, @config['exclude'])
+          deployment = Deployment::FullDeployment.new(@repo, backend, @config['exclude'])
         rescue Git::DiffError
           log.fatal('Error: could not generate diff')
           log.fatal('Try merging remote changes before running dandelion again')
@@ -154,7 +155,7 @@ module Dandelion
         end
       end
       
-      def service
+      def build_backend
         if @config['scheme'] == 'sftp'
           require 'dandelion/backend/sftp'
           klass = Backend::SFTP

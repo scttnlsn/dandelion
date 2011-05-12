@@ -6,9 +6,9 @@ module Dandelion
     class FastForwardError < StandardError; end
   
     class Deployment
-      def initialize(repo, service, exclude = nil, revision = 'HEAD')
+      def initialize(repo, backend, exclude = nil, revision = 'HEAD')
         @repo = repo
-        @service = service
+        @backend = backend
         @exclude = exclude || []
         @tree = Git::Tree.new(@repo, revision)
       end
@@ -22,11 +22,11 @@ module Dandelion
       end
     
       def remote_uri
-        @service.uri
+        @backend.uri
       end
     
       def write_revision
-        @service.write('.revision', local_revision)
+        @backend.write('.revision', local_revision)
       end
       
       def validate_state(remote = nil)
@@ -50,8 +50,8 @@ module Dandelion
     end
   
     class DiffDeployment < Deployment
-      def initialize(repo, service, exclude = nil, revision = 'HEAD')
-        super(repo, service, exclude, revision)
+      def initialize(repo, backend, exclude = nil, revision = 'HEAD')
+        super(repo, backend, exclude, revision)
         @diff = Git::Diff.new(@repo, read_remote_revision, revision)
       end
     
@@ -77,7 +77,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Uploading file: #{file}")
-            @service.write(file, @tree.show(file))
+            @backend.write(file, @tree.show(file))
           end
         end
       end
@@ -88,7 +88,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Deleting file: #{file}")
-            @service.delete(file)
+            @backend.delete(file)
           end
         end
       end
@@ -105,8 +105,8 @@ module Dandelion
     
       def read_remote_revision
         begin
-          @service.read('.revision').chomp
-        rescue Service::MissingFileError
+          @backend.read('.revision').chomp
+        rescue Backend::MissingFileError
           raise RemoteRevisionError
         end
       end
@@ -119,7 +119,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Uploading file: #{file}")
-            @service.write(file, @tree.show(file))
+            @backend.write(file, @tree.show(file))
           end
         end
         write_revision
