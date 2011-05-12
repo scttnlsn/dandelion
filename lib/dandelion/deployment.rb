@@ -21,10 +21,6 @@ module Dandelion
         nil
       end
     
-      def remote_uri
-        @backend.uri
-      end
-    
       def write_revision
         @backend.write('.revision', local_revision)
       end

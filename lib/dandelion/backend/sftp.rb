@@ -1,3 +1,5 @@
+require 'net/sftp'
+
 module Dandelion
   module Backend
     class SFTP < Backend
@@ -8,9 +10,7 @@ module Dandelion
       end
       
       def initialize(host, username, password, path)
-        require 'net/sftp'
-        super(host, username, path)
-        @scheme = 'sftp'
+        @host, @username, @path = host, username, path
         @sftp = Net::SFTP.start(host, username, :password => password)
       end
 
@@ -47,6 +47,10 @@ module Dandelion
         rescue Net::SFTP::StatusException => e
           raise unless e.code == 2
         end
+      end
+      
+      def to_s
+        "sftp://#{@username}@#{@host}/#{@path}"
       end
 
       private

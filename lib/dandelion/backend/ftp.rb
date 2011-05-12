@@ -1,10 +1,10 @@
+require 'net/ftp'
+
 module Dandelion
   module Backend
     class FTP < Backend
       def initialize(host, username, password, path)
-        require 'net/ftp'
-        super(host, username, path)
-        @scheme = 'ftp'
+        @host, @username, @path = host, username, path
         @ftp = Net::FTP.open(host, username, password)
         @ftp.passive = true
         @ftp.chdir(path)
@@ -40,6 +40,10 @@ module Dandelion
         rescue Net::FTPPermError => e
         end
       end
+      
+      def to_s
+        "ftp://#{@username}@#{@host}/#{@path}"
+      end
 
       private
 
@@ -64,7 +68,6 @@ module Dandelion
           mkdir_p(parent_dir)
           @ftp.mkdir(dir)
         end
-
       end
     end
   end

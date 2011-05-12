@@ -1,3 +1,5 @@
+require 'aws/s3'
+
 module Dandelion
   module Backend
     class S3 < Backend
@@ -7,13 +9,11 @@ module Dandelion
         end
       end
       
-      def initialize(access_key_id, secret_access_key, bucket_name, prefix)
-        require 'aws/s3'
-        super('Amazon S3', access_key_id, prefix)
-        @scheme = 's3'
+      def initialize(access_key_id, secret_access_key, bucket_name, path)
         @access_key_id = access_key_id
         @secret_access_key = secret_access_key
         @bucket_name = bucket_name
+        @path = path
       end
 
       def read(file)
@@ -30,6 +30,10 @@ module Dandelion
       def delete(file)
         s3connect!
         AWS::S3::S3Object.delete path(file), @bucket_name
+      end
+      
+      def to_s
+        "s3://#{@access_key_id}@#{@bucket_name}/#{@path}"
       end
 
       protected

@@ -121,7 +121,7 @@ module Dandelion
       
       def execute
         backend = build_backend
-        log.info("Connecting to:    #{backend.uri}")
+        log.info("Connecting to:    #{backend}")
         deployment(backend) do |d|
           log.info("Remote revision:  #{d.remote_revision || '---'}")
           log.info("Local revision:   #{d.local_revision}")

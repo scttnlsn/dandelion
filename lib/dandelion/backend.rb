@@ -10,16 +10,6 @@ module Dandelion
           []
         end
       end
-      
-      def initialize(host, username, path)
-        @host = host
-        @username = username
-        @path = path
-      end
-
-      def uri
-        "#{@scheme}://#{@username}@#{@host}/#{@path}"
-      end
 
       protected
 
