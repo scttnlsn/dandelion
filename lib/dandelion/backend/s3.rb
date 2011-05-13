@@ -7,12 +7,12 @@ module Dandelion
         end
       end
       
-      def initialize(access_key_id, secret_access_key, bucket_name, path)
+      def initialize(config)
         require 'aws/s3'
-        @access_key_id = access_key_id
-        @secret_access_key = secret_access_key
-        @bucket_name = bucket_name
-        @path = path
+        @access_key_id = config['access_key_id']
+        @secret_access_key = config['secret_access_key']
+        @bucket_name = config['bucket_name']
+        @path = config['path']
       end
 
       def read(file)

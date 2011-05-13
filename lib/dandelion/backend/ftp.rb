@@ -1,12 +1,14 @@
 module Dandelion
   module Backend
     class FTP < Backend
-      def initialize(host, username, password, path)
+      def initialize(config)
         require 'net/ftp'
-        @host, @username, @path = host, username, path
-        @ftp = Net::FTP.open(host, username, password)
+        @host = config['host']
+        @username = config['username']
+        @path = config['path']
+        @ftp = Net::FTP.open(@host, @username, config['password'])
         @ftp.passive = true
-        @ftp.chdir(path)
+        @ftp.chdir(@path)
       end
 
       def read(file)
