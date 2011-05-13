@@ -18,9 +18,7 @@ module Dandelion
         @@backends = {}
         
         def create(config)
-          require 'dandelion/backend/ftp'
-          require 'dandelion/backend/s3'
-          require 'dandelion/backend/sftp'
+          Dir.glob(File.join(File.dirname(__FILE__), 'backend', '*.rb')) { |file| require file }
           raise UnsupportedSchemeError unless @@backends.include? config['scheme']
           begin
             @@backends[config['scheme']].new(config)
