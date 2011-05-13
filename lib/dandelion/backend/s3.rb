@@ -1,11 +1,8 @@
 module Dandelion
   module Backend
     class S3 < Backend
-      class << self
-        def gems
-          ['aws-s3']
-        end
-      end
+      scheme 's3'
+      gems 'aws-s3'
       
       def initialize(config)
         require 'aws/s3'

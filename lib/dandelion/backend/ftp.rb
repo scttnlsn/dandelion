@@ -1,6 +1,8 @@
 module Dandelion
   module Backend
     class FTP < Backend
+      scheme 'ftp'
+      
       def initialize(config)
         require 'net/ftp'
         @host = config['host']

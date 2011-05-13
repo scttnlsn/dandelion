@@ -1,11 +1,8 @@
 module Dandelion
   module Backend
     class SFTP < Backend
-      class << self
-        def gems
-          ['net-sftp']
-        end
-      end
+      scheme 'sftp'
+      gems 'net-sftp'
       
       def initialize(config)
         require 'net/sftp'

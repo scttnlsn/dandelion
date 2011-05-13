@@ -15,28 +15,30 @@ module Dandelion
 
     class Backend
       class << self
+        @@backends = {}
+        
         def create(config)
-          if config['scheme'] == 'sftp'
-            require 'dandelion/backend/sftp'
-            klass = SFTP
-          elsif config['scheme'] == 'ftp'
-            require 'dandelion/backend/ftp'
-            klass = FTP
-          elsif config['scheme'] == 's3'
-            require 'dandelion/backend/s3'
-            klass = S3
-          else
-            raise UnsupportedSchemeError
-          end
+          require 'dandelion/backend/ftp'
+          require 'dandelion/backend/s3'
+          require 'dandelion/backend/sftp'
+          raise UnsupportedSchemeError unless @@backends.include? config['scheme']
           begin
-            klass.new(config)
+            @@backends[config['scheme']].new(config)
           rescue LoadError
-            raise MissingDependencyError.new(klass.gems)
+            raise MissingDependencyError.new(@@backends[config['scheme']].gem_list)
           end
         end
         
-        def gems
-          []
+        def scheme(scheme)
+          @@backends[scheme] = self
+        end
+        
+        def gems(*gems)
+          @gems = gems
+        end
+        
+        def gem_list
+          @gems
         end
       end
 
