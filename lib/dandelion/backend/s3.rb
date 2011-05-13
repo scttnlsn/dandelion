@@ -1,5 +1,3 @@
-require 'aws/s3'
-
 module Dandelion
   module Backend
     class S3 < Backend
@@ -10,6 +8,7 @@ module Dandelion
       end
       
       def initialize(access_key_id, secret_access_key, bucket_name, path)
+        require 'aws/s3'
         @access_key_id = access_key_id
         @secret_access_key = secret_access_key
         @bucket_name = bucket_name

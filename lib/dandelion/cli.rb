@@ -120,68 +120,40 @@ module Dandelion
       end
       
       def execute
-        backend = build_backend
-        log.info("Connecting to:    #{backend}")
-        deployment(backend) do |d|
-          log.info("Remote revision:  #{d.remote_revision || '---'}")
-          log.info("Local revision:   #{d.local_revision}")
-          
-          if @command == 'status'
-            exit
-          elsif @command == 'deploy'
-            validate_deployment d
-            d.deploy
-            log.info("Deployment complete")
-          end
-        end
-      end
-      
-      private
-      
-      def deployment(backend)
         begin
-          deployment = Deployment::DiffDeployment.new(@repo, backend, @config['exclude'])
-        rescue Deployment::RemoteRevisionError
-          deployment = Deployment::FullDeployment.new(@repo, backend, @config['exclude'])
-        rescue Git::DiffError
-          log.fatal('Error: could not generate diff')
-          log.fatal('Try merging remote changes before running dandelion again')
+          backend = Backend::Backend.create(@config)
+          log.info("Connecting to:    #{backend}")
+        rescue Backend::MissingDependencyError => e
+          log.fatal("The '#{@config['scheme']}' scheme requires additional gems:")
+          log.fatal('    ' + e.gems.join("\n    ") + "\n")
+          log.fatal("Please install the gems: gem install #{e.gems.join(' ')}")
           exit
-        end
-        if block_given?
-          yield(deployment)
-        else
-          deployment
-        end
-      end
-      
-      def build_backend
-        if @config['scheme'] == 'sftp'
-          require 'dandelion/backend/sftp'
-          klass = Backend::SFTP
-          args = [@config['host'], @config['username'], @config['password'], @config['path']]
-        elsif @config['scheme'] == 'ftp'
-          require 'dandelion/backend/ftp'
-          klass = Backend::FTP
-          args = [@config['host'], @config['username'], @config['password'], @config['path']]
-        elsif @config['scheme'] == 's3'
-          require 'dandelion/backend/s3'
-          klass = Backend::S3
-          args = [@config['access_key_id'], @config['secret_access_key'], @config['bucket'], @config['path']]
-        else
+        rescue Backend::UnsupportedSchemeError
           log.fatal("Unsupported scheme: #{@config['scheme']}")
           exit
         end
         
         begin
-          klass.new(*args)
-        rescue LoadError
-          log.fatal("The '#{@config['scheme']}' scheme requires additional gems:")
-          log.fatal('    ' + klass.gems.join("\n    ") + "\n")
-          log.fatal("Please install the gems: gem install #{klass.gems.join(' ')}")
+          deployment = Deployment::Deployment.create(@repo, backend, @config['exclude'])
+        rescue Git::DiffError
+          log.fatal('Error: could not generate diff')
+          log.fatal('Try merging remote changes before running dandelion again')
           exit
         end
+
+        log.info("Remote revision:  #{deployment.remote_revision || '---'}")
+        log.info("Local revision:   #{deployment.local_revision}")
+          
+        if @command == 'status'
+          exit
+        elsif @command == 'deploy'
+          validate_deployment deployment
+          deployment.deploy
+          log.info("Deployment complete")
+        end
       end
+      
+      private
       
       def validate_deployment(deployment)
         begin

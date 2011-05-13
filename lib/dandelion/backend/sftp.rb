@@ -1,5 +1,3 @@
-require 'net/sftp'
-
 module Dandelion
   module Backend
     class SFTP < Backend
@@ -10,6 +8,7 @@ module Dandelion
       end
       
       def initialize(host, username, password, path)
+        require 'net/sftp'
         @host, @username, @path = host, username, path
         @sftp = Net::SFTP.start(host, username, :password => password)
       end

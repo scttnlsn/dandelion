@@ -6,6 +6,16 @@ module Dandelion
     class FastForwardError < StandardError; end
   
     class Deployment
+      class << self
+        def create(repo, backend, exclude)
+          begin
+            DiffDeployment.new(repo, backend, exclude)
+          rescue RemoteRevisionError
+            FullDeployment.new(repo, backend, exclude)
+          end
+        end
+      end
+      
       def initialize(repo, backend, exclude = nil, revision = 'HEAD')
         @repo = repo
         @backend = backend

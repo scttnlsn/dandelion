@@ -1,9 +1,8 @@
-require 'net/ftp'
-
 module Dandelion
   module Backend
     class FTP < Backend
       def initialize(host, username, password, path)
+        require 'net/ftp'
         @host, @username, @path = host, username, path
         @ftp = Net::FTP.open(host, username, password)
         @ftp.passive = true
