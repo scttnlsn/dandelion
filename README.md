@@ -39,26 +39,17 @@ by the given scheme.
 **SFTP**: `scheme: sftp`
 
 Required parameters:
-* `host`
-* `username`
-* `password`
-* `path`
+`host`, `username`, `password`, `path`
     
 **FTP**: `scheme: ftp`
 
 Required parameters:
-* `host`
-* `username`
-* `password`
-* `path`
+`host`, `username`, `password`, `path`
     
 **Amazon S3**: `scheme: s3`
 
 Required parameters:
-* `access_key_id`
-* `secret_access_key`
-* `bucket_name`
-* `path`
+`access_key_id`, `secret_access_key`, `bucket_name`, `path`
 
 Usage
 -----
