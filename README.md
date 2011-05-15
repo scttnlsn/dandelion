@@ -15,11 +15,11 @@ Alternatively, you can build the gem yourself:
     
 Config
 ------
-Configuration options are specified in a YAML file (Dandelion looks for a file
-named `dandelion.yml` by default):
+Configuration options are specified in a YAML file (Dandelion looks for 
+`dandelion.yml` by default). Example:
 
     # Required
-    scheme: sftp # sftp/ftp
+    scheme: sftp
     host: example.com
     username: user
     password: pass
@@ -29,7 +29,37 @@ named `dandelion.yml` by default):
     exclude:
         - .gitignore
         - dandelion.yml
+
+Schemes
+-------
+There is support for multiple backend file transfer schemes.  The configuration
+must specify one of these schemes and the set of additional parameters required
+by the given scheme.
+
+**SFTP**: `scheme: sftp`
+
+Required parameters:
+    - `host`
+    - `username`
+    - `password`
+    - `path`
     
+**FTP**: `scheme: ftp`
+
+Required parameters:
+    - `host`
+    - `username`
+    - `password`
+    - `path`
+    
+**Amazon S3**: `scheme: s3`
+
+Required parameters:
+    - `access_key_id`
+    - `secret_access_key`
+    - `bucket_name`
+    - `path`
+
 Usage
 -----
 From the root directory of a Git repository, run:
