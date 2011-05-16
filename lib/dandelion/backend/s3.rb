@@ -40,7 +40,7 @@ module Dandelion
             
       def path(file)
         if @path and !@path.empty?
-          "#{@path}/file"
+          "#{@path}/#{file}"
         else
           file
         end
