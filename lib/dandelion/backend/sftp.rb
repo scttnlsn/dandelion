@@ -24,16 +24,15 @@ module Dandelion
       end
 
       def write(file, data)
-        path = File.join(@path, file)
-        begin
-          dir = File.dirname(path)
-          @sftp.stat!(dir)
-        rescue Net::SFTP::StatusException => e
-          raise unless e.code == 2
-          mkdir_p(dir)
-        end
         temp(file, data) do |temp|
-          @sftp.upload!(temp, path)
+          begin
+            path = File.join(@path, file)
+            @sftp.upload!(temp, path)
+          rescue Net::SFTP::StatusException => e
+            raise unless e.code == 2
+            mkdir_p(File.dirname(path))
+            @sftp.upload!(temp, path)
+          end
         end
       end
 
@@ -54,18 +53,16 @@ module Dandelion
       private
 
       def cleanup(dir)
-        unless File.identical?(dir, @path)
+        unless File.expand_path(dir) == File.expand_path(@path)
           if empty?(dir)
             @sftp.rmdir!(dir)
             cleanup(File.dirname(dir))
           end
         end
       end
-
+      
       def empty?(dir)
-        @sftp.dir.entries(dir).map do |entry|
-          entry.name unless entry.name == '.' or entry.name == '..'
-        end.compact.empty?
+        @sftp.dir.entries(dir).delete_if { |file| file.name == '.' or file.name == '..' }.empty?
       end
 
       def mkdir_p(dir)
@@ -74,7 +71,7 @@ module Dandelion
         rescue Net::SFTP::StatusException => e
           raise unless e.code == 2
           mkdir_p(File.dirname(dir))
-          mkdir_p(dir)
+          @sftp.mkdir!(dir)
         end
       end
     end

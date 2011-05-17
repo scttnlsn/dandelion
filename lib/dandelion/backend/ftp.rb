@@ -51,7 +51,7 @@ module Dandelion
       private
 
       def cleanup(dir)
-        unless File.identical?(dir, @path)
+        unless dir == '.'
           if empty?(dir)
             @ftp.rmdir(dir)
             cleanup(File.dirname(dir))
@@ -64,12 +64,12 @@ module Dandelion
       end
 
       def mkdir_p(dir)
-        return if dir == "."
-        parent_dir = File.dirname(dir)
-        file_names = @ftp.nlst(parent_dir)
-        unless file_names.include? dir
-          mkdir_p(parent_dir)
-          @ftp.mkdir(dir)
+        unless dir == '.'
+          parent = File.dirname(dir)
+          unless @ftp.nlst(parent).include? dir
+            mkdir_p(parent)
+            @ftp.mkdir(dir)
+          end
         end
       end
     end
