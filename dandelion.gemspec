@@ -13,6 +13,8 @@ Gem::Specification.new do |s|
   s.description = 'Incremental Git repository deployment'
   
   s.add_dependency 'grit', '>= 2.4.1'
+  
+  s.add_development_dependency 'mocha', '>= 0.9.12'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

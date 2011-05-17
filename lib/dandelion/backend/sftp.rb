@@ -1,3 +1,5 @@
+require 'dandelion/backend'
+
 module Dandelion
   module Backend
     class SFTP < Backend
