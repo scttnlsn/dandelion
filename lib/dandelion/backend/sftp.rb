@@ -56,7 +56,7 @@ module Dandelion
       end
 
       def cleanup(dir)
-        unless cleanpath(dir) == cleanpath(@path) or dir == File.dirname(dir)
+        unless cleanpath(dir) == cleanpath(@config['path']) or dir == File.dirname(dir)
           if empty? dir
             @sftp.rmdir! dir
             cleanup File.dirname(dir)
