@@ -38,18 +38,18 @@ by the given scheme.
 
 **SFTP**: `scheme: sftp`
 
-Required parameters:
-`host`, `username`, `password`, `path`
+Required: `host`, `username`, `password`
+Optional: `path`, `exclude`
     
 **FTP**: `scheme: ftp`
 
-Required parameters:
-`host`, `username`, `password`, `path`
+Required: `host`, `username`, `password`
+Optional: `path`, `exclude`
     
 **Amazon S3**: `scheme: s3`
 
-Required parameters:
-`access_key_id`, `secret_access_key`, `bucket_name`, `path`
+Required: `access_key_id`, `secret_access_key`, `bucket_name`
+Optional: `path`, `exclude`
 
 Usage
 -----
