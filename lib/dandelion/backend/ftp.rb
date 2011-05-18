@@ -7,12 +7,10 @@ module Dandelion
       
       def initialize(config)
         require 'net/ftp'
-        @host = config['host']
-        @username = config['username']
-        @path = config['path']
-        @ftp = Net::FTP.open(@host, @username, config['password'])
+        @config = config
+        @ftp = Net::FTP.open(@config['host'], @config['username'], @config['password'])
         @ftp.passive = true
-        @ftp.chdir(@path)
+        @ftp.chdir(config['path'])
       end
 
       def read(file)
@@ -30,11 +28,13 @@ module Dandelion
       end
 
       def write(file, data)
-        # Creates directory only if necessary
-        mkdir_p(File.dirname(file))
-
         temp(file, data) do |temp|
-          @ftp.putbinaryfile(temp, file)
+          begin
+            @ftp.putbinaryfile(temp, file)
+          rescue Net::FTPPermError => e
+            mkdir_p(File.dirname(file))
+            @ftp.putbinaryfile(temp, file)
+          end
         end
       end
 
@@ -47,13 +47,13 @@ module Dandelion
       end
       
       def to_s
-        "ftp://#{@username}@#{@host}/#{@path}"
+        "ftp://#{@config['username']}@#{@config['host']}/#{@config['path']}"
       end
 
       private
 
       def cleanup(dir)
-        unless dir == '.'
+        unless dir == File.dirname(dir)
           if empty?(dir)
             @ftp.rmdir(dir)
             cleanup(File.dirname(dir))
@@ -66,10 +66,11 @@ module Dandelion
       end
 
       def mkdir_p(dir)
-        unless dir == '.'
-          parent = File.dirname(dir)
-          unless @ftp.nlst(parent).include? dir
-            mkdir_p(parent)
+        unless dir == File.dirname(dir)
+          begin
+            @ftp.mkdir(dir)
+          rescue Net::FTPPermError => e
+            mkdir_p(File.dirname(dir))
             @ftp.mkdir(dir)
           end
         end
