@@ -8,6 +8,11 @@ class TestSFTP < Test::Unit::TestCase
     @sftp = mock()
     Net::SFTP.stubs(:start).returns(@sftp)
     @backend = Dandelion::Backend::SFTP.new('path' => 'foo')
+    class << @backend
+      def temp(file, data)
+        yield(:temp)
+      end
+    end
   end
   
   def test_read
@@ -21,19 +26,7 @@ class TestSFTP < Test::Unit::TestCase
     @backend.read('bar/baz/qux')
   end
   
-  def test_write_temp
-    @backend.expects(:temp).with('bar', 'baz').once
-    @backend.expects(:temp).with('bar/baz', 'qux').once
-    @backend.write('bar', 'baz')
-    @backend.write('bar/baz', 'qux')
-  end
-  
-  def test_write_upload
-    class << @backend
-      def temp(file, data)
-        yield(:temp)
-      end
-    end
+  def test_write
     @sftp.expects(:upload!).with(:temp, 'foo/bar').once
     @sftp.expects(:upload!).with(:temp, 'foo/bar/baz').once
     @backend.write('bar', 'baz')
