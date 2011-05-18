@@ -1,4 +1,5 @@
 require 'dandelion/backend'
+require 'pathname'
 
 module Dandelion
   module Backend
@@ -8,15 +9,13 @@ module Dandelion
       
       def initialize(config)
         require 'net/sftp'
-        @host = config['host']
-        @username = config['username']
-        @path = config['path']
-        @sftp = Net::SFTP.start(@host, @username, :password => config['password'])
+        @config = config
+        @sftp = Net::SFTP.start(@config['host'], @config['username'], :password => @config['password'])
       end
 
       def read(file)
         begin
-          @sftp.file.open(File.join(@path, file), 'r') do |f|
+          @sftp.file.open(path(file), 'r') do |f|
             f.gets
           end
         rescue Net::SFTP::StatusException => e
@@ -28,37 +27,39 @@ module Dandelion
       def write(file, data)
         temp(file, data) do |temp|
           begin
-            path = File.join(@path, file)
-            @sftp.upload!(temp, path)
+            @sftp.upload! temp, path(file)
           rescue Net::SFTP::StatusException => e
             raise unless e.code == 2
-            mkdir_p(File.dirname(path))
-            @sftp.upload!(temp, path)
+            mkdir_p File.dirname(path(file))
+            @sftp.upload! temp, path(file)
           end
         end
       end
 
       def delete(file)
         begin
-          path = File.join(@path, file)
-          @sftp.remove!(path)
-          cleanup(File.dirname(path))
+          @sftp.remove! path(file)
+          cleanup File.dirname(path(file))
         rescue Net::SFTP::StatusException => e
           raise unless e.code == 2
         end
       end
       
       def to_s
-        "sftp://#{@username}@#{@host}/#{@path}"
+        "sftp://#{@config['username']}@#{@config['host']}/#{@config['path']}"
       end
 
       private
+      
+      def cleanpath(path)
+        Pathname.new(path).cleanpath.to_path if path
+      end
 
       def cleanup(dir)
-        unless File.expand_path(dir) == File.expand_path(@path)
-          if empty?(dir)
-            @sftp.rmdir!(dir)
-            cleanup(File.dirname(dir))
+        unless cleanpath(dir) == cleanpath(@path) or dir == File.dirname(dir)
+          if empty? dir
+            @sftp.rmdir! dir
+            cleanup File.dirname(dir)
           end
         end
       end
@@ -69,11 +70,19 @@ module Dandelion
 
       def mkdir_p(dir)
         begin
-          @sftp.mkdir!(dir)
+          @sftp.mkdir! dir
         rescue Net::SFTP::StatusException => e
           raise unless e.code == 2
-          mkdir_p(File.dirname(dir))
-          @sftp.mkdir!(dir)
+          mkdir_p File.dirname(dir)
+          retry
+        end
+      end
+      
+      def path(file)
+        if @config['path'] and !@config['path'].empty?
+          File.join @config['path'], file
+        else
+          file
         end
       end
     end
