@@ -52,7 +52,7 @@ module Dandelion
       private
       
       def cleanpath(path)
-        Pathname.new(path).cleanpath.to_path if path
+        Pathname.new(path).cleanpath.to_s if path
       end
 
       def cleanup(dir)
