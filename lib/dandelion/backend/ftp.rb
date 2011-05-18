@@ -30,18 +30,18 @@ module Dandelion
       def write(file, data)
         temp(file, data) do |temp|
           begin
-            @ftp.putbinaryfile(temp, file)
+            @ftp.putbinaryfile temp, file
           rescue Net::FTPPermError => e
-            mkdir_p(File.dirname(file))
-            @ftp.putbinaryfile(temp, file)
+            mkdir_p File.dirname(file)
+            @ftp.putbinaryfile temp, file
           end
         end
       end
 
       def delete(file)
         begin
-          @ftp.delete(file)
-          cleanup(File.dirname(file))
+          @ftp.delete file
+          cleanup File.dirname(file)
         rescue Net::FTPPermError => e
         end
       end
@@ -54,9 +54,9 @@ module Dandelion
 
       def cleanup(dir)
         unless dir == File.dirname(dir)
-          if empty?(dir)
-            @ftp.rmdir(dir)
-            cleanup(File.dirname(dir))
+          if empty? dir
+            @ftp.rmdir dir
+            cleanup File.dirname(dir)
           end
         end
       end
@@ -68,10 +68,10 @@ module Dandelion
       def mkdir_p(dir)
         unless dir == File.dirname(dir)
           begin
-            @ftp.mkdir(dir)
+            @ftp.mkdir dir
           rescue Net::FTPPermError => e
-            mkdir_p(File.dirname(dir))
-            @ftp.mkdir(dir)
+            mkdir_p File.dirname(dir)
+            @ftp.mkdir dir
           end
         end
       end
