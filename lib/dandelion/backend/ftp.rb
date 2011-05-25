@@ -9,7 +9,7 @@ module Dandelion
         require 'net/ftp'
         @config = config
         @ftp = Net::FTP.open(@config['host'], @config['username'], @config['password'])
-        @ftp.passive = true
+        @ftp.passive = @config['passive'] || true
         @ftp.chdir(@config['path']) if @config['path']
       end
 

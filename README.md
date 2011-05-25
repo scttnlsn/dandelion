@@ -44,7 +44,7 @@ Optional: `path`, `exclude`
 **FTP**: `scheme: ftp`
 
 Required: `host`, `username`, `password`
-Optional: `path`, `exclude`
+Optional: `path`, `exclude`, `passive` (defaults to true)
     
 **Amazon S3**: `scheme: s3`
 
