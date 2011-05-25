@@ -9,7 +9,7 @@ module Dandelion
         require 'net/ftp'
         @config = config
         @ftp = Net::FTP.open(@config['host'], @config['username'], @config['password'])
-        @ftp.passive = @config['passive'] || true
+        @ftp.passive = @config['passive'].nil? ? true : to_b(@config['passive'])
         @ftp.chdir(@config['path']) if @config['path']
       end
 
@@ -74,6 +74,10 @@ module Dandelion
             @ftp.mkdir(dir)
           end
         end
+      end
+      
+      def to_b(value)
+        return [true, 'true', 1, '1', 'T', 't'].include?(value.class == String ? value.downcase : value)
       end
     end
   end
