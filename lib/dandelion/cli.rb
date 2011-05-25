@@ -20,10 +20,10 @@ module Dandelion
       end
       
       def parse(args)
-        order @global, args
+        order(@global, args)
         command = args.shift
         if command and @commands[command]
-          order @commands[command], args
+          order(@commands[command], args)
         end
         
         if @commands.key? command
@@ -108,11 +108,11 @@ module Dandelion
       
       def initialize(args)
         @options = Options.new
-        @command = @options.parse args
+        @command = @options.parse(args)
         
         validate_files
-        @config = YAML.load_file(File.expand_path @options.config_file)
-        @repo = Git::Repo.new(File.expand_path @options[:repo])
+        @config = YAML.load_file(File.expand_path(@options.config_file))
+        @repo = Git::Repo.new(File.expand_path(@options[:repo]))
       end
       
       def log
@@ -120,9 +120,26 @@ module Dandelion
       end
       
       def execute
+        deployment = deployment()
+        log.info("Remote revision:  #{deployment.remote_revision || '---'}")
+        log.info("Local revision:   #{deployment.local_revision}")
+          
+        if @command == 'status'
+          exit
+        elsif @command == 'deploy'
+          validate_deployment(deployment)
+          deployment.deploy
+          log.info("Deployment complete")
+        end
+      end
+      
+      private
+      
+      def backend
         begin
           backend = Backend::Backend.create(@config)
           log.info("Connecting to:    #{backend}")
+          backend
         rescue Backend::MissingDependencyError => e
           log.fatal("The '#{@config['scheme']}' scheme requires additional gems:")
           log.fatal('    ' + e.gems.join("\n    ") + "\n")
@@ -132,28 +149,17 @@ module Dandelion
           log.fatal("Unsupported scheme: #{@config['scheme']}")
           exit
         end
-        
+      end
+      
+      def deployment
         begin
-          deployment = Deployment::Deployment.create(@repo, backend, @config['exclude'])
+          Deployment::Deployment.create(@repo, backend, @config['exclude'])
         rescue Git::DiffError
           log.fatal('Error: could not generate diff')
           log.fatal('Try merging remote changes before running dandelion again')
           exit
         end
-
-        log.info("Remote revision:  #{deployment.remote_revision || '---'}")
-        log.info("Local revision:   #{deployment.local_revision}")
-          
-        if @command == 'status'
-          exit
-        elsif @command == 'deploy'
-          validate_deployment deployment
-          deployment.deploy
-          log.info("Deployment complete")
-        end
       end
-      
-      private
       
       def validate_deployment(deployment)
         begin
@@ -171,11 +177,11 @@ module Dandelion
       end
       
       def validate_files
-        unless File.exists? File.expand_path File.join(@options[:repo], '.git')
+        unless File.exists?(File.expand_path(File.join(@options[:repo], '.git')))
           log.fatal("Not a git repository: #{@options[:repo]}")
           exit
         end
-        unless File.exists?(File.expand_path @options.config_file)
+        unless File.exists?(File.expand_path(@options.config_file))
           log.fatal("Could not find file: #{@options.config_file}")
           exit
         end

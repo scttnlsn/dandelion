@@ -16,18 +16,18 @@ module Dandelion
 
       def read(file)
         s3connect!
-        raise MissingFileError unless AWS::S3::S3Object.exists? path(file), @bucket_name
-        AWS::S3::S3Object.value path(file), @bucket_name
+        raise MissingFileError unless AWS::S3::S3Object.exists?(path(file), @bucket_name)
+        AWS::S3::S3Object.value(path(file), @bucket_name)
       end
 
       def write(file, data)
         s3connect!
-        AWS::S3::S3Object.store path(file), data, @bucket_name
+        AWS::S3::S3Object.store(path(file), data, @bucket_name)
       end
 
       def delete(file)
         s3connect!
-        AWS::S3::S3Object.delete path(file), @bucket_name
+        AWS::S3::S3Object.delete(path(file), @bucket_name)
       end
       
       def to_s

@@ -20,7 +20,7 @@ module Dandelion
         @from_revision = from_revision
         @to_revision = to_revision
         begin
-          @files = parse_diff @repo.git.native(:diff, {:name_status => true, :raise => true}, from_revision, to_revision)
+          @files = parse(diff)
         rescue Grit::Git::CommandFailed
           raise DiffError
         end
@@ -35,8 +35,12 @@ module Dandelion
       end
 
       private
+      
+      def diff
+        @repo.git.native(:diff, {:name_status => true, :raise => true}, from_revision, to_revision)
+      end
     
-      def parse_diff(diff)
+      def parse(diff)
         files = {}
         diff.split("\n").each do |line|
           status, file = line.split("\t")

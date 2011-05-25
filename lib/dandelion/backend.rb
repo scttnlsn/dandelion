@@ -19,7 +19,7 @@ module Dandelion
         
         def create(config)
           Dir.glob(File.join(File.dirname(__FILE__), 'backend', '*.rb')) { |file| require file }
-          raise UnsupportedSchemeError unless @@backends.include? config['scheme']
+          raise UnsupportedSchemeError unless @@backends.include?(config['scheme'])
           begin
             @@backends[config['scheme']].new(config)
           rescue LoadError

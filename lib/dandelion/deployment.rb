@@ -7,11 +7,11 @@ module Dandelion
   
     class Deployment
       class << self
-        def create(repo, backend, exclude)
+        def create(repo, backend, exclude = nil, revision = 'HEAD')
           begin
-            DiffDeployment.new(repo, backend, exclude)
+            DiffDeployment.new(repo, backend, exclude, revision)
           rescue RemoteRevisionError
-            FullDeployment.new(repo, backend, exclude)
+            FullDeployment.new(repo, backend, exclude, revision)
           end
         end
       end
@@ -37,7 +37,7 @@ module Dandelion
       
       def validate_state(remote = nil)
         begin
-          if remote and @repo.git.native(:remote, {:raise => true}, 'show', remote) =~ /fast-forward/i
+          if remote and fast_forwardable(remote)
             raise FastForwardError
           end
         rescue Grit::Git::CommandFailed
@@ -52,6 +52,12 @@ module Dandelion
     
       def exclude_file?(file)
         return @exclude.map { |e| file.start_with?(e) }.any?
+      end
+      
+      private
+      
+      def fast_forwardable(remote)
+        @repo.git.native(:remote, {:raise => true}, 'show', remote) =~ /fast-forward/i
       end
     end
   

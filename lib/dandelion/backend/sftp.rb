@@ -27,19 +27,19 @@ module Dandelion
       def write(file, data)
         temp(file, data) do |temp|
           begin
-            @sftp.upload! temp, path(file)
+            @sftp.upload!(temp, path(file))
           rescue Net::SFTP::StatusException => e
             raise unless e.code == 2
-            mkdir_p File.dirname(path(file))
-            @sftp.upload! temp, path(file)
+            mkdir_p(File.dirname(path(file)))
+            @sftp.upload!(temp, path(file))
           end
         end
       end
 
       def delete(file)
         begin
-          @sftp.remove! path(file)
-          cleanup File.dirname(path(file))
+          @sftp.remove!(path(file))
+          cleanup(File.dirname(path(file)))
         rescue Net::SFTP::StatusException => e
           raise unless e.code == 2
         end
@@ -57,9 +57,9 @@ module Dandelion
 
       def cleanup(dir)
         unless cleanpath(dir) == cleanpath(@config['path']) or dir == File.dirname(dir)
-          if empty? dir
-            @sftp.rmdir! dir
-            cleanup File.dirname(dir)
+          if empty?(dir)
+            @sftp.rmdir!(dir)
+            cleanup(File.dirname(dir))
           end
         end
       end
@@ -70,17 +70,17 @@ module Dandelion
 
       def mkdir_p(dir)
         begin
-          @sftp.mkdir! dir
+          @sftp.mkdir!(dir)
         rescue Net::SFTP::StatusException => e
           raise unless e.code == 2
-          mkdir_p File.dirname(dir)
-          retry
+          mkdir_p(File.dirname(dir))
+          @sftp.mkdir!(dir)
         end
       end
       
       def path(file)
         if @config['path'] and !@config['path'].empty?
-          File.join @config['path'], file
+          File.join(@config['path'], file)
         else
           file
         end
