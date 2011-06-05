@@ -23,9 +23,9 @@ Configuration options are specified in a YAML file (Dandelion looks for
     host: example.com
     username: user
     password: pass
-    path: path/to/deployment
     
     # Optional
+    path: path/to/deployment
     exclude:
         - .gitignore
         - dandelion.yml
