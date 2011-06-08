@@ -68,7 +68,7 @@ files which have changed since the last deployment need to be transferred.
 For a more complete summary of usage options, run:
 
     $ dandelion -h
-    Usage: dandelion [options] [[command] [options]]
+    Usage: dandelion [options] [[command] [options]] [config_file]
         -v, --version                    Display the current version
         -h, --help                       Display this screen
             --repo=[REPO]                Use the given repository
@@ -76,3 +76,9 @@ For a more complete summary of usage options, run:
     Available commands:
         deploy
         status
+
+Or:
+
+    $ dandelion COMMAND -h
+
+To see the options for a given command.
