@@ -61,7 +61,7 @@ Or:
 
     $ dandelion deploy path/to/config.yml
     
-This will deploy the local `HEAD` revision to the server specified in the config
+This will deploy the local `HEAD` revision to the location specified in the config
 file.  Dandelion keeps track of the most recently deployed revision so that only
 files which have changed since the last deployment need to be transferred.
 
