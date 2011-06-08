@@ -1,5 +1,6 @@
-dandelion
+Dandelion
 =========
+Incremental Git repository deployment.
 
 Install
 -------
