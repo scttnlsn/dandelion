@@ -9,11 +9,9 @@ require 'yaml'
 module Dandelion
   module Cli
     class Options
-      attr_reader :config_file
-      
       def initialize
         @options = {}
-        @config_file = 'dandelion.yml'
+        @config_file = nil
         @global = global_parser
         @commands = { 'deploy' => deploy_parser, 'status' => status_parser }
         @commands_help = "\nAvailable commands:\n    #{@commands.keys.join("\n    ")}"
@@ -47,7 +45,19 @@ module Dandelion
         @options[key] = value
       end
       
+      def config_file
+        @config_file || File.join(@options[:repo], 'dandelion.yml')
+      end
+      
       private
+      
+      def closest_repo(dir)
+        if File.exists?(File.join(dir, '.git'))
+          dir
+        else
+          File.dirname(dir) != dir && closest_repo(File.dirname(dir))
+        end
+      end
       
       def global_parser
         OptionParser.new do |opts|
@@ -64,7 +74,7 @@ module Dandelion
             exit
           end
           
-          @options[:repo] = '.'
+          @options[:repo] = closest_repo(File.expand_path('.'))
           opts.on('--repo=[REPO]', 'Use the given repository') do |repo|
             @options[:repo] = repo
           end

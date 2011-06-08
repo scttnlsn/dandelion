@@ -15,8 +15,8 @@ Alternatively, you can build the gem yourself:
     
 Config
 ------
-Configuration options are specified in a YAML file (Dandelion looks for 
-`dandelion.yml` by default). Example:
+Configuration options are specified in a YAML file (the root of your Git repository
+is searched for a file named `dandelion.yml` by default). Example:
 
     # Required
     scheme: sftp
@@ -53,7 +53,7 @@ Optional: `path`, `exclude`
 
 Usage
 -----
-From the root directory of a Git repository, run:
+From within your Git repository, run:
 
     $ dandelion deploy
     
@@ -68,7 +68,7 @@ files which have changed since the last deployment need to be transferred.
 For a more complete summary of usage options, run:
 
     $ dandelion -h
-    Usage: dandelion [options] [[command] [options]]
+    Usage: dandelion [options] [[command] [options]] [config_file]
         -v, --version                    Display the current version
         -h, --help                       Display this screen
             --repo=[REPO]                Use the given repository
