@@ -76,3 +76,9 @@ For a more complete summary of usage options, run:
     Available commands:
         deploy
         status
+
+Or:
+
+    $ dandelion COMMAND -h
+
+To see the options for a given command.
