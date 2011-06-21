@@ -3,7 +3,7 @@ require 'pathname'
 
 module Dandelion
   module Backend
-    class SFTP < Backend
+    class SFTP < Backend::Base
       scheme 'sftp'
       gems 'net-sftp'
       

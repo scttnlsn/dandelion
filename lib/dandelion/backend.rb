@@ -13,7 +13,7 @@ module Dandelion
       end
     end
 
-    class Backend
+    class Base
       class << self
         @@backends = {}
         

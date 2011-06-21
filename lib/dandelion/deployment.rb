@@ -35,10 +35,10 @@ module Dandelion
         @backend.write('.revision', local_revision)
       end
       
-      def validate_state(remote = nil)
+      def validate
         begin
-          if remote and fast_forwardable(remote)
-            raise FastForwardError
+          @repo.remote_list.each do |remote|
+            raise FastForwardError if fast_forwardable(remote)
           end
         rescue Grit::Git::CommandFailed
         end

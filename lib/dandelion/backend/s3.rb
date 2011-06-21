@@ -2,7 +2,7 @@ require 'dandelion/backend'
 
 module Dandelion
   module Backend
-    class S3 < Backend
+    class S3 < Backend::Base
       scheme 's3'
       gems 'aws-s3'
       

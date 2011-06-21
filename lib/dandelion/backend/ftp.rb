@@ -2,7 +2,7 @@ require 'dandelion/backend'
 
 module Dandelion
   module Backend
-    class FTP < Backend
+    class FTP < Backend::Base
       scheme 'ftp'
       
       def initialize(config)

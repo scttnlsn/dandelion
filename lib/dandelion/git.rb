@@ -3,6 +3,7 @@ require 'grit'
 module Dandelion
   module Git
     class DiffError < StandardError; end
+    class RevisionError < StandardError; end
   
     class Repo < Grit::Repo
       def initialize(dir)
@@ -54,6 +55,7 @@ module Dandelion
       def initialize(repo, revision)
         @repo = repo
         @commit = @repo.commit(revision)
+        raise RevisionError if @commit.nil?
         @tree = @commit.tree
       end
     
