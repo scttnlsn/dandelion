@@ -21,6 +21,12 @@ module Dandelion
         @backend = backend
         @options = { :exclude => [], :revision => 'HEAD' }.merge(options)
         @tree = Git::Tree.new(@repo, @options[:revision])
+        
+        if @options[:dry]
+          # Stub out the destructive backend methods
+          def @backend.write(file, data); end
+          def @beckend.delete(file); end
+        end
       end
     
       def local_revision
@@ -32,7 +38,7 @@ module Dandelion
       end
     
       def write_revision
-        @backend.write('.revision', local_revision) unless @options[:dry]
+        @backend.write('.revision', local_revision)
       end
       
       def validate
@@ -89,7 +95,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Uploading file: #{file}")
-            @backend.write(file, @tree.show(file)) unless @options[:dry]
+            @backend.write(file, @tree.show(file))
           end
         end
       end
@@ -100,7 +106,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Deleting file: #{file}")
-            @backend.delete(file) unless @options[:dry]
+            @backend.delete(file)
           end
         end
       end
@@ -131,7 +137,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Uploading file: #{file}")
-            @backend.write(file, @tree.show(file)) unless @options[:dry]
+            @backend.write(file, @tree.show(file))
           end
         end
         write_revision
