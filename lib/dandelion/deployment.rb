@@ -7,20 +7,20 @@ module Dandelion
   
     class Deployment
       class << self
-        def create(repo, backend, exclude = nil, revision = 'HEAD')
+        def create(repo, backend, options)
           begin
-            DiffDeployment.new(repo, backend, exclude, revision)
+            DiffDeployment.new(repo, backend, options)
           rescue RemoteRevisionError
-            FullDeployment.new(repo, backend, exclude, revision)
+            FullDeployment.new(repo, backend, options)
           end
         end
       end
       
-      def initialize(repo, backend, exclude = nil, revision = 'HEAD')
+      def initialize(repo, backend, options = {})
         @repo = repo
         @backend = backend
-        @exclude = exclude || []
-        @tree = Git::Tree.new(@repo, revision)
+        @options = { :exclude => [], :revision => 'HEAD' }.merge(options)
+        @tree = Git::Tree.new(@repo, @options[:revision])
       end
     
       def local_revision
@@ -32,7 +32,7 @@ module Dandelion
       end
     
       def write_revision
-        @backend.write('.revision', local_revision)
+        @backend.write('.revision', local_revision) unless @options[:dry]
       end
       
       def validate
@@ -51,7 +51,7 @@ module Dandelion
       protected
     
       def exclude_file?(file)
-        return @exclude.map { |e| file.start_with?(e) }.any?
+        return @options[:exclude].map { |e| file.start_with?(e) }.any?
       end
       
       private
@@ -62,9 +62,9 @@ module Dandelion
     end
   
     class DiffDeployment < Deployment
-      def initialize(repo, backend, exclude = nil, revision = 'HEAD')
-        super(repo, backend, exclude, revision)
-        @diff = Git::Diff.new(@repo, read_remote_revision, revision)
+      def initialize(repo, backend, options = {})
+        super(repo, backend, options)
+        @diff = Git::Diff.new(@repo, read_remote_revision, @options[:revision])
       end
     
       def remote_revision
@@ -89,7 +89,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Uploading file: #{file}")
-            @backend.write(file, @tree.show(file))
+            @backend.write(file, @tree.show(file)) unless @options[:dry]
           end
         end
       end
@@ -100,7 +100,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Deleting file: #{file}")
-            @backend.delete(file)
+            @backend.delete(file) unless @options[:dry]
           end
         end
       end
@@ -131,7 +131,7 @@ module Dandelion
             log.info("Skipping file: #{file}")
           else
             log.info("Uploading file: #{file}")
-            @backend.write(file, @tree.show(file))
+            @backend.write(file, @tree.show(file)) unless @options[:dry]
           end
         end
         write_revision

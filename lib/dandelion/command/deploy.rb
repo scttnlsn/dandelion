@@ -12,6 +12,11 @@ module Dandelion
             opts.on('-f', '--force', 'Force deployment') do
               options[:force] = true
             end
+            
+            options[:dry] = false
+            opts.on('--dry-run', 'Show what would have been deployed') do
+              options[:dry] = true
+            end
           end
         end
       end
