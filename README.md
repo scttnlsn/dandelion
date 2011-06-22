@@ -81,6 +81,11 @@ This will deploy the local `HEAD` revision to the location specified in the conf
 file.  Dandelion keeps track of the most recently deployed revision so that only
 files which have changed since the last deployment need to be transferred.
 
+You can also specify an arbitrary revision you wish to deploy and Dandelion will
+determine which files need to be transferred.
+
+    $ dandelion deploy <revision>
+
 For a more complete summary of usage options, run:
 
     $ dandelion -h
