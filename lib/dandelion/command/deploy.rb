@@ -31,9 +31,18 @@ module Dandelion
         log.info("Remote revision:      #{@deployment.remote_revision || '---'}")
         log.info("Deploying revision:   #{@deployment.local_revision}")
         
-        validate(@deployment)
-        @deployment.deploy
+        begin
+          @deployment.validate
+        rescue Deployment::FastForwardError
+          if !@options[:force]
+            log.warn('Warning: you are trying to deploy unpushed commits')
+            log.warn('This could potentially prevent others from being able to deploy')
+            log.warn('If you are sure you want to this, use the -f option to force deployment')
+            exit 1
+          end
+        end
         
+        @deployment.deploy
         log.info("Deployment complete")
       end
     end

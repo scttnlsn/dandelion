@@ -77,8 +77,6 @@ module Dandelion
         @config = YAML.load_file(@options[:config])
         @repo = Git::Repo.new(@options[:repo])
         
-        log.info("Using config: #{@options[:config]}")
-        
         yield(self) if block_given?
       end
       
@@ -112,21 +110,6 @@ module Dandelion
           log.fatal('Error: could not generate diff')
           log.fatal('Try merging remote changes before running dandelion again')
           exit 1
-        end
-      end
-      
-      def validate(deployment)
-        begin
-          @repo.remote_list.each do |remote|
-            deployment.validate_state(remote)
-          end
-        rescue Deployment::FastForwardError
-          if !@options[:force]
-            log.warn('Warning: you are trying to deploy unpushed commits')
-            log.warn('This could potentially prevent others from being able to deploy')
-            log.warn('If you are sure you want to this, use the -f option to force deployment')
-            exit 1
-          end
         end
       end
     end

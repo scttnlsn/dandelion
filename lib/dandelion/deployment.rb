@@ -57,7 +57,7 @@ module Dandelion
       private
       
       def fast_forwardable(remote)
-        @repo.git.native(:remote, {:raise => true}, 'show', remote) =~ /fast-forward/i
+        !(@repo.git.native(:remote, {:raise => true}, 'show', remote) =~ /fast-forward/i).nil?
       end
     end
   
