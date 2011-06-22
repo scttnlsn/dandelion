@@ -94,7 +94,7 @@ For a more complete summary of usage options, run:
         deploy
         status
         
-Note that when specifying the repository or configuration file, the specified paths
+Note that when specifying the repository or configuration file, the given paths
 are relative to the current working directory (not the repository root).  To see
 the options for a particular command, run:
 
