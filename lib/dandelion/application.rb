@@ -60,11 +60,11 @@ module Dandelion
     end
     
     def validate
-      unless File.exists?(File.expand_path(File.join(@options[:repo], '.git')))
+      unless File.exists?(File.join(@options[:repo], '.git'))
         log.fatal("Not a git repository: #{@options[:repo]}")
         exit 1
       end
-      unless File.exists?(File.expand_path(@options[:config]))
+      unless File.exists?(@options[:config])
         log.fatal("Could not find file: #{@options[:config]}")
         exit 1
       end
