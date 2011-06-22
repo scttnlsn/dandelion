@@ -40,36 +40,42 @@ by the given scheme.
 **SFTP**: `scheme: sftp`
 
 Required:
-* `host`
-* `username`
-* `password`
+
+ * `host`
+ * `username`
+ * `password`
 
 Optional:
-* `path`
-* `exclude`
+
+ * `path`
+ * `exclude`
     
 **FTP**: `scheme: ftp`
 
 Required:
-* `host`
-* `username`
-* `password`
+
+ * `host`
+ * `username`
+ * `password`
 
 Optional:
-* `path`
-* `exclude`
-* `passive` (defaults to true)
+
+ * `path`
+ * `exclude`
+ * `passive` (defaults to true)
     
 **Amazon S3**: `scheme: s3`
 
 Required:
-* `access_key_id`
-* `secret_access_key`
-* `bucket_name`
+
+ * `access_key_id`
+ * `secret_access_key`
+ * `bucket_name`
 
 Optional:
-* `path`
-* `exclude`
+
+ * `path`
+ * `exclude`
 
 Usage
 -----
@@ -78,11 +84,11 @@ From within your Git repository, run:
     $ dandelion deploy
     
 This will deploy the local `HEAD` revision to the location specified in the config
-file.  Dandelion keeps track of the most recently deployed revision so that only
-files which have changed since the last deployment need to be transferred.
+file.  Dandelion keeps track of the currently deployed revision so that only files
+which have been added/changed/deleted need to be transferred.
 
-You can also specify an arbitrary revision you wish to deploy and Dandelion will
-determine which files need to be transferred.
+You can specify the revision you wish to deploy and Dandelion will determine which
+files need to be transferred:
 
     $ dandelion deploy <revision>
 
