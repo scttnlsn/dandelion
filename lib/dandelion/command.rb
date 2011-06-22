@@ -54,7 +54,7 @@ module Dandelion
               options[:repo] = File.expand_path(repo)
             end
             
-            options[:config] = 'dandelion.yml'
+            options[:config] = nil
             opts.on('--config=[CONFIG]', 'Use the given configuration file') do |config|
               options[:config] = File.expand_path(config)
             end
