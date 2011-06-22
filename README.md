@@ -16,8 +16,8 @@ Alternatively, you can build the gem yourself:
     
 Config
 ------
-Configuration options are specified in a YAML file (the root of your Git repository
-is searched for a file named `dandelion.yml` by default). Example:
+Configuration options are specified in a YAML file (by default, the root of your
+Git repository is searched for a file named `dandelion.yml`). Example:
 
     # Required
     scheme: sftp
@@ -39,28 +39,43 @@ by the given scheme.
 
 **SFTP**: `scheme: sftp`
 
-Required: `host`, `username`, `password`
-Optional: `path`, `exclude`
+Required:
+* `host`
+* `username`
+* `password`
+
+Optional:
+* `path`
+* `exclude`
     
 **FTP**: `scheme: ftp`
 
-Required: `host`, `username`, `password`
-Optional: `path`, `exclude`, `passive` (defaults to true)
+Required:
+* `host`
+* `username`
+* `password`
+
+Optional:
+* `path`
+* `exclude`
+* `passive` (defaults to true)
     
 **Amazon S3**: `scheme: s3`
 
-Required: `access_key_id`, `secret_access_key`, `bucket_name`
-Optional: `path`, `exclude`
+Required:
+* `access_key_id`
+* `secret_access_key`
+* `bucket_name`
+
+Optional:
+* `path`
+* `exclude`
 
 Usage
 -----
 From within your Git repository, run:
 
     $ dandelion deploy
-    
-Or:
-
-    $ dandelion deploy path/to/config.yml
     
 This will deploy the local `HEAD` revision to the location specified in the config
 file.  Dandelion keeps track of the most recently deployed revision so that only
@@ -69,17 +84,18 @@ files which have changed since the last deployment need to be transferred.
 For a more complete summary of usage options, run:
 
     $ dandelion -h
-    Usage: dandelion [options] [[command] [options]] [config_file]
+    Usage: dandelion [options] <command> [<args>]
         -v, --version                    Display the current version
         -h, --help                       Display this screen
             --repo=[REPO]                Use the given repository
+            --config=[CONFIG]            Use the given configuration file
 
     Available commands:
         deploy
         status
+        
+Note that when specifying the repository or configuration file, the specified paths
+are relative to the current working directory (not the repository root).  To see
+the options for a particular command, run:
 
-Or:
-
-    $ dandelion COMMAND -h
-
-To see the options for a given command.
+    $ dandelion <command> -h

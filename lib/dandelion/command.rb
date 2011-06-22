@@ -19,7 +19,7 @@ module Dandelion
         end
 
         def create(name)
-          Dir.glob(File.join(File.dirname(__FILE__), 'command', '*.rb')) { |file| require file }
+          require_commands
           raise InvalidCommandError unless @@commands.include?(name)
           @@commands[name]
         end
@@ -27,10 +27,14 @@ module Dandelion
         def commands
           @@commands.keys
         end
+        
+        def require_commands
+          Dir.glob(File.join(File.dirname(__FILE__), 'command', '*.rb')) { |file| require file }
+        end
 
         def parser(options)
           OptionParser.new do |opts|
-            opts.banner = 'Usage: dandelion [options] [[command] [options]]'
+            opts.banner = 'Usage: dandelion [options] <command> [<args>]'
 
             opts.on('-v', '--version', 'Display the current version') do
               puts "Dandelion #{Dandelion::VERSION}"
@@ -38,18 +42,21 @@ module Dandelion
             end
 
             opts.on('-h', '--help', 'Display this screen') do
+              require_commands
               puts opts
+              puts "\nAvailable commands:"
+              puts commands.map { |name| "    #{name}" }.join("\n")
               exit
             end
 
             options[:repo] = closest_repo(File.expand_path('.'))
             opts.on('--repo=[REPO]', 'Use the given repository') do |repo|
-              options[:repo] = repo
+              options[:repo] = File.expand_path(repo)
             end
             
-            options[:config] = nil
+            options[:config] = 'dandelion.yml'
             opts.on('--config=[CONFIG]', 'Use the given configuration file') do |config|
-              options[:config] = config
+              options[:config] = File.expand_path(config)
             end
           end
         end
@@ -60,15 +67,17 @@ module Dandelion
           if File.exists?(File.join(dir, '.git'))
             dir
           else
-            File.dirname(dir) != dir && closest_repo(File.dirname(dir))
+            File.dirname(dir) != dir && closest_repo(File.dirname(dir)) || File.expand_path('.')
           end
         end
       end
 
       def initialize(options)
         @options = options        
-        @config = YAML.load_file(File.expand_path(@options[:config]))
-        @repo = Git::Repo.new(File.expand_path(@options[:repo]))
+        @config = YAML.load_file(@options[:config])
+        @repo = Git::Repo.new(@options[:repo])
+        
+        log.info("Using config: #{@options[:config]}")
         
         yield(self) if block_given?
       end
