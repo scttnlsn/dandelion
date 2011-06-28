@@ -6,7 +6,7 @@ module Dandelion
       class << self
         def parser(options)
           OptionParser.new do |opts|
-            opts.banner = 'Usage: deploy [options] <revision>'
+            opts.banner = 'Usage: deploy [options] [<revision>]'
       
             options[:force] = false
             opts.on('-f', '--force', 'Force deployment') do
