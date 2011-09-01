@@ -10,7 +10,11 @@ module Dandelion
       def initialize(config)
         require 'net/sftp'
         @config = config
-        @sftp = Net::SFTP.start(@config['host'], @config['username'], :password => @config['password'])
+        options = {
+          :password => @config['password'],
+          :port => @config['port'] || Net::SSH::Transport::Session::DEFAULT_PORT,
+        }
+        @sftp = Net::SFTP.start(@config['host'], @config['username'], options)
       end
 
       def read(file)

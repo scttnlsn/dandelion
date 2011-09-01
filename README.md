@@ -49,6 +49,7 @@ Optional:
 
  * `path`
  * `exclude`
+ * `port`
     
 **FTP**: `scheme: ftp`
 
@@ -62,6 +63,7 @@ Optional:
 
  * `path`
  * `exclude`
+ * `port`
  * `passive` (defaults to true)
     
 **Amazon S3**: `scheme: s3`

@@ -8,7 +8,9 @@ module Dandelion
       def initialize(config)
         require 'net/ftp'
         @config = config
-        @ftp = Net::FTP.open(@config['host'], @config['username'], @config['password'])
+        @ftp = Net::FTP.new
+        @ftp.connect(@config['host'], @config['port'] || Net::FTP::FTP_PORT)
+        @ftp.login(@config['username'], @config['password'])
         @ftp.passive = @config['passive'].nil? ? true : to_b(@config['passive'])
         @ftp.chdir(@config['path']) if @config['path']
       end
