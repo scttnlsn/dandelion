@@ -42,7 +42,7 @@ module Dandelion
           if !@options[:force]
             log.warn('Warning: you are trying to deploy unpushed commits')
             log.warn('This could potentially prevent others from being able to deploy')
-            log.warn('If you are sure you want to this, use the -f option to force deployment')
+            log.warn('If you are sure you want to do this, use the -f option to force deployment')
             exit 1
           end
         end
