@@ -25,7 +25,7 @@ module Dandelion
         if @options[:dry]
           # Stub out the destructive backend methods
           def @backend.write(file, data); end
-          def @beckend.delete(file); end
+          def @backend.delete(file); end
         end
       end
     
