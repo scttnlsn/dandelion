@@ -1,12 +1,14 @@
 require 'dandelion/backend/ftp'
-require 'mocha'
 require 'net/ftp'
 require 'test/unit'
+require 'mocha'
 
 class TestFTP < Test::Unit::TestCase
   def setup
     @ftp = mock()
-    Net::FTP.stubs(:open).returns(@ftp)
+    Net::FTP.stubs(:new).returns(@ftp)
+    @ftp.expects(:connect).once
+    @ftp.expects(:login).once
     @ftp.expects(:passive=).with(true).once
     @ftp.expects(:chdir).with('foo').once
     @backend = Dandelion::Backend::FTP.new('path' => 'foo')

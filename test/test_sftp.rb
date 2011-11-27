@@ -1,7 +1,7 @@
 require 'dandelion/backend/sftp'
-require 'mocha'
 require 'net/sftp'
 require 'test/unit'
+require 'mocha'
 
 class TestSFTP < Test::Unit::TestCase
   def setup
