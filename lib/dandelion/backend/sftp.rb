@@ -9,7 +9,7 @@ module Dandelion
       
       def initialize(config)
         require 'net/sftp'
-        @config = config
+        @config = { 'preserve_permissions' => true }.merge(config)
         options = {
           :password => @config['password'],
           :port => @config['port'] || Net::SSH::Transport::Session::DEFAULT_PORT,
@@ -38,6 +38,10 @@ module Dandelion
             @sftp.upload!(temp, path(file))
           end
         end
+        if @config['preserve_permissions']
+          mode = get_mode(file)
+          @sftp.setstat!(path(file), :permissions => mode) if mode
+        end
       end
 
       def delete(file)
@@ -54,7 +58,12 @@ module Dandelion
       end
 
       private
-      
+
+      def get_mode(file)
+        stat = File.stat(file) if File.exists?(file)
+        stat.mode if stat
+      end
+
       def cleanpath(path)
         Pathname.new(path).cleanpath.to_s if path
       end
