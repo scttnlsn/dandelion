@@ -27,8 +27,15 @@ class TestSFTP < Test::Unit::TestCase
   end
   
   def test_write
+    File.stubs(:stat).returns(stub(mode: 0xDEADBEEF))
+    File.stubs(:exists?).with('bar').returns(true)
+    File.stubs(:exists?).with('bar/baz').returns(true)
+
     @sftp.expects(:upload!).with(:temp, 'foo/bar').once
+    @sftp.expects(:setstat!).with('foo/bar', :permissions => 0xDEADBEEF).once
     @sftp.expects(:upload!).with(:temp, 'foo/bar/baz').once
+    @sftp.expects(:setstat!).with('foo/bar/baz', :permissions => 0xDEADBEEF).once
+
     @backend.write('bar', 'baz')
     @backend.write('bar/baz', 'qux')
   end
