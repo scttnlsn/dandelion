@@ -50,6 +50,7 @@ Optional:
  * `path`
  * `exclude`
  * `port`
+ * `preserve_permissions` (defaults to true)
     
 **FTP**: `scheme: ftp`
 
