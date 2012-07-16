@@ -38,7 +38,7 @@ module Dandelion
       end
     
       def write_revision
-        @backend.write('.revision', local_revision)
+        @backend.write('REVISION', local_revision)
       end
       
       def validate
@@ -123,7 +123,7 @@ module Dandelion
     
       def read_remote_revision
         begin
-          @backend.read('.revision').chomp
+          @backend.read('REVISION').chomp
         rescue Backend::MissingFileError
           raise RemoteRevisionError
         end
