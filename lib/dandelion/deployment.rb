@@ -19,7 +19,7 @@ module Dandelion
       def initialize(repo, backend, options = {})
         @repo = repo
         @backend = backend
-        @options = { :exclude => [], :revision => 'HEAD' }.merge(options)
+        @options = { :exclude => [], :revision => 'HEAD', :revision_file => '.revision' }.merge(options)
         @tree = Git::Tree.new(@repo, @options[:revision])
         
         if @options[:dry]
@@ -38,7 +38,7 @@ module Dandelion
       end
     
       def write_revision
-        @backend.write('.revision', local_revision)
+        @backend.write(@options[:revision_file], local_revision)
       end
       
       def validate
@@ -123,7 +123,7 @@ module Dandelion
     
       def read_remote_revision
         begin
-          @backend.read('.revision').chomp
+          @backend.read(@options[:revision_file]).chomp
         rescue Backend::MissingFileError
           raise RemoteRevisionError
         end
