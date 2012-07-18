@@ -30,6 +30,7 @@ Git repository is searched for a file named `dandelion.yml`). Example:
     exclude:
         - .gitignore
         - dandelion.yml
+    revision_file: .revision
 
 Schemes
 -------
@@ -50,8 +51,9 @@ Optional:
  * `path`
  * `exclude`
  * `port`
+ * `revision_file` (defaults to .revision)
  * `preserve_permissions` (defaults to true)
-    
+
 **FTP**: `scheme: ftp`
 
 Required:
@@ -65,6 +67,7 @@ Optional:
  * `path`
  * `exclude`
  * `port`
+ * `revision_file` (defaults to .revision)
  * `passive` (defaults to true)
     
 **Amazon S3**: `scheme: s3`
@@ -79,6 +82,7 @@ Optional:
 
  * `path`
  * `exclude`
+ * `revision_file` (defaults to .revision)
 
 Usage
 -----
