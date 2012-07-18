@@ -60,7 +60,7 @@ class MockBackend
   attr_reader :reads, :writes, :deletes
   
   def initialize(remote_revision)
-    @reads = {'REVISION' => remote_revision}
+    @reads = {'.revision' => remote_revision}
     @writes = {}
     @deletes = []
   end
@@ -87,7 +87,8 @@ class TestDiffDeployment < Test::Unit::TestCase
     @remote_revision = 'ff1f1d4bd0c99e1c9cca047c46b2194accf89504'
     @repo = MockRepo.new
     @backend = MockBackend.new(@remote_revision)
-    @diff_deployment = Dandelion::Deployment::DiffDeployment.new(@repo, @backend, :revision => @head_revision)
+    @revision_file = '.revision'
+    @diff_deployment = Dandelion::Deployment::DiffDeployment.new(@repo, @backend, @revision_file, :revision => @head_revision)
   end
   
   def test_diff_deployment_local_revision
@@ -100,7 +101,7 @@ class TestDiffDeployment < Test::Unit::TestCase
   
   def test_diff_deployment_write_revision
     @diff_deployment.write_revision
-    assert_equal @head_revision, @backend.writes['REVISION']
+    assert_equal @head_revision, @backend.writes['.revision']
   end
   
   def test_diff_deployment_revisions_match
@@ -116,7 +117,7 @@ class TestDiffDeployment < Test::Unit::TestCase
     assert_equal 3, @backend.writes.length
     assert_equal 'bar', @backend.writes['foo']
     assert_equal 'bar', @backend.writes['baz/foo']
-    assert_equal @head_revision, @backend.writes['REVISION']
+    assert_equal @head_revision, @backend.writes['.revision']
     assert_equal ['foobar'], @backend.deletes
   end
 end
