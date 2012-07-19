@@ -7,20 +7,19 @@ module Dandelion
   
     class Deployment
       class << self
-        def create(repo, backend, revision_file, options)
+        def create(repo, backend, options)
           begin
-            DiffDeployment.new(repo, backend, revision_file, options)
+            DiffDeployment.new(repo, backend, options)
           rescue RemoteRevisionError
-            FullDeployment.new(repo, backend, revision_file, options)
+            FullDeployment.new(repo, backend, options)
           end
         end
       end
       
-      def initialize(repo, backend, revision_file, options = {})
+      def initialize(repo, backend, options = {})
         @repo = repo
         @backend = backend
-        @revision_file = revision_file
-        @options = { :exclude => [], :revision => 'HEAD' }.merge(options)
+        @options = { :exclude => [], :revision => 'HEAD', :revision_file => '.revision' }.merge(options)
         @tree = Git::Tree.new(@repo, @options[:revision])
         
         if @options[:dry]
@@ -39,7 +38,7 @@ module Dandelion
       end
     
       def write_revision
-        @backend.write(@revision_file, local_revision)
+        @backend.write(@options[:revision_file], local_revision)
       end
       
       def validate
@@ -69,8 +68,8 @@ module Dandelion
     end
   
     class DiffDeployment < Deployment
-      def initialize(repo, backend, revision_file, options = {})
-        super(repo, backend, revision_file, options)
+      def initialize(repo, backend, options = {})
+        super(repo, backend, options)
         @diff = Git::Diff.new(@repo, read_remote_revision, @options[:revision])
       end
     
@@ -124,7 +123,7 @@ module Dandelion
     
       def read_remote_revision
         begin
-          @backend.read(@revision_file).chomp
+          @backend.read(@options[:revision_file]).chomp
         rescue Backend::MissingFileError
           raise RemoteRevisionError
         end

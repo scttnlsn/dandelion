@@ -87,8 +87,7 @@ class TestDiffDeployment < Test::Unit::TestCase
     @remote_revision = 'ff1f1d4bd0c99e1c9cca047c46b2194accf89504'
     @repo = MockRepo.new
     @backend = MockBackend.new(@remote_revision)
-    @revision_file = '.revision'
-    @diff_deployment = Dandelion::Deployment::DiffDeployment.new(@repo, @backend, @revision_file, :revision => @head_revision)
+    @diff_deployment = Dandelion::Deployment::DiffDeployment.new(@repo, @backend, :revision => @head_revision)
   end
   
   def test_diff_deployment_local_revision
