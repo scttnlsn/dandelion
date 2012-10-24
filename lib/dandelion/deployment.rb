@@ -57,7 +57,7 @@ module Dandelion
       protected
     
       def exclude_file?(file)
-        return @options[:exclude].map { |e| file.start_with?(e) }.any?
+        @options[:exclude].map { |e| file.start_with?(e) }.any? unless @options[:exclude].nil?
       end
       
       private
