@@ -82,7 +82,7 @@ module Dandelion
           deploy_changed
           deploy_deleted
         else
-          log.info("Nothing to deploy")
+          log.debug("Nothing to deploy")
         end
         unless revisions_match?
           write_revision
@@ -92,9 +92,9 @@ module Dandelion
       def deploy_changed
         @diff.changed.each do |file|
           if exclude_file?(file)
-            log.info("Skipping file: #{file}")
+            log.debug("Skipping file: #{file}")
           else
-            log.info("Uploading file: #{file}")
+            log.debug("Uploading file: #{file}")
             @backend.write(file, @tree.show(file))
           end
         end
@@ -103,9 +103,9 @@ module Dandelion
       def deploy_deleted
         @diff.deleted.each do |file|
           if exclude_file?(file)
-            log.info("Skipping file: #{file}")
+            log.debug("Skipping file: #{file}")
           else
-            log.info("Deleting file: #{file}")
+            log.debug("Deleting file: #{file}")
             @backend.delete(file)
           end
         end
@@ -134,9 +134,9 @@ module Dandelion
       def deploy
         @tree.files.each do |file|
           if exclude_file?(file)
-            log.info("Skipping file: #{file}")
+            log.debug("Skipping file: #{file}")
           else
-            log.info("Uploading file: #{file}")
+            log.debug("Uploading file: #{file}")
             @backend.write(file, @tree.show(file))
           end
         end

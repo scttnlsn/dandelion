@@ -3,7 +3,7 @@ module Dandelion
     def logger
       return @log if @log
       @log = Logger.new(STDOUT)
-      @log.level = Logger::INFO
+      @log.level = Logger::DEBUG
       @log.formatter = formatter
       @log
     end

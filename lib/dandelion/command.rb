@@ -49,6 +49,18 @@ module Dandelion
               exit
             end
 
+            opts.on('--log=[level]', 'Use the given log level (fatal, error, warn, info, debug)') do |level|
+              levels = {
+                :fatal => Logger::FATAL,
+                :error => Logger::ERROR,
+                :warn => Logger::WARN,
+                :info => Logger::INFO,
+                :debug => Logger::DEBUG
+              }
+
+              Dandelion.logger.level = levels[level.to_sym]
+            end
+
             options[:repo] = closest_repo(File.expand_path('.'))
             opts.on('--repo=[REPO]', 'Use the given repository') do |repo|
               options[:repo] = File.expand_path(repo)
