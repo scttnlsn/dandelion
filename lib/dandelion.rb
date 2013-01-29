@@ -2,7 +2,8 @@ module Dandelion
   class << self
     def logger
       return @log if @log
-      @log = Logger.new(STDOUT)
+      $stdout.sync = true
+      @log = Logger.new($stdout)
       @log.level = Logger::DEBUG
       @log.formatter = formatter
       @log
