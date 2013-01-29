@@ -43,9 +43,7 @@ module Dandelion
       
       def validate
         begin
-          @repo.remote_list.each do |remote|
-            raise FastForwardError if fast_forwardable(remote)
-          end
+          raise FastForwardError if fast_forwardable
         rescue Grit::Git::CommandFailed
         end
       end
@@ -62,8 +60,8 @@ module Dandelion
       
       private
       
-      def fast_forwardable(remote)
-        !(@repo.git.native(:remote, {:raise => true, :timeout => false}, 'show', remote) =~ /fast-forward/i).nil?
+      def fast_forwardable
+        !@repo.git.native(:cherry, {:raise => true, :timeout => false}).empty?
       end
     end
   
