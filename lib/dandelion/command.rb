@@ -118,7 +118,7 @@ module Dandelion
         begin
           backend ||= backend()
           revision_file = @config['revision_file'].nil? ? '.revision' : @config['revision_file']
-          options = { :exclude => @config['exclude'], :revision => revision, :revision_file => revision_file, :dry => @options[:dry] }
+          options = { :exclude => @config['exclude'], :additional => @config['additional'], :revision => revision, :revision_file => revision_file, :dry => @options[:dry] }
           Deployment::Deployment.create(@repo, backend, options)
         rescue Git::DiffError
           log.fatal('Error: could not generate diff')
