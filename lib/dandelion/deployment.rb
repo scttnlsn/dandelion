@@ -19,7 +19,7 @@ module Dandelion
       def initialize(repo, backend, options = {})
         @repo = repo
         @backend = backend
-        @options = { :exclude => [], :revision => 'HEAD', :revision_file => '.revision' }.merge(options)
+        @options = { :exclude => [], :additional => [], :revision => 'HEAD', :revision_file => '.revision' }.merge(options)
         @tree = Git::Tree.new(@repo, @options[:revision])
         
         if @options[:dry]
@@ -80,15 +80,30 @@ module Dandelion
           deploy_changed
           deploy_deleted
         else
-          log.debug("Nothing to deploy")
+          log.debug("No changes to deploy")
         end
         unless revisions_match?
           write_revision
         end
+        deploy_additional
       end
-    
+
+      def deploy_additional
+
+        if @options[:additional].empty?
+          log.debug("No additional files to deploy")
+          return
+        end
+
+        @options[:additional].each do |file|
+            log.debug("Uploading additional file: #{file}")
+            @backend.write(file, file)
+          end
+      end
+
       def deploy_changed
         @diff.changed.each do |file|
+          p file
           if exclude_file?(file)
             log.debug("Skipping file: #{file}")
           else
