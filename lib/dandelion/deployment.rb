@@ -97,7 +97,7 @@ module Dandelion
 
         @options[:additional].each do |file|
             log.debug("Uploading additional file: #{file}")
-            @backend.write(file, file)
+            @backend.write(file, IO.read(file))
           end
       end
 
