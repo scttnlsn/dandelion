@@ -103,7 +103,6 @@ module Dandelion
 
       def deploy_changed
         @diff.changed.each do |file|
-          p file
           if exclude_file?(file)
             log.debug("Skipping file: #{file}")
           else

@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'grit'
 
 module Dandelion
