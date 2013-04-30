@@ -53,7 +53,7 @@ module Dandelion
       end
 
       def deploy_additional
-        if @options[:additional].empty?
+        if @options[:additional].nil? || @options[:additional].empty?
           log.debug("No additional files to deploy")
           return
         end
