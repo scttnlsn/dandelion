@@ -51,6 +51,18 @@ module Dandelion
       def log
         Dandelion.logger
       end
+
+      def deploy_additional
+        if @options[:additional].empty?
+          log.debug("No additional files to deploy")
+          return
+        end
+
+        @options[:additional].each do |file|
+          log.debug("Uploading additional file: #{file}")
+          @backend.write(file, IO.read(file))
+        end
+      end
     
       protected
     
@@ -82,23 +94,12 @@ module Dandelion
         else
           log.debug("No changes to deploy")
         end
+
+        deploy_additional
+
         unless revisions_match?
           write_revision
         end
-        deploy_additional
-      end
-
-      def deploy_additional
-
-        if @options[:additional].empty?
-          log.debug("No additional files to deploy")
-          return
-        end
-
-        @options[:additional].each do |file|
-            log.debug("Uploading additional file: #{file}")
-            @backend.write(file, IO.read(file))
-          end
       end
 
       def deploy_changed
@@ -152,6 +153,8 @@ module Dandelion
             @backend.write(file, @tree.show(file))
           end
         end
+        
+        deploy_additional
         write_revision
       end
     end
