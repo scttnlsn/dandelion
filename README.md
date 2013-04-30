@@ -32,9 +32,9 @@ Git repository is searched for a file named `dandelion.yml`). Example:
         - dandelion.yml
     revision_file: .revision
     additional:
-          - public/css/print.css
-          - public/css/screen.css
-          - public/js/main.js
+        - public/css/print.css
+        - public/css/screen.css
+        - public/js/main.js
 
 Schemes
 -------
