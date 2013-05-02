@@ -33,7 +33,7 @@ Git repository is searched for a file named `dandelion.yml`). Example:
     # Remote path
     path: path/to/deployment
     
-    # Remove file name in which current revision is stored
+    # Remote file name in which the current revision is stored
     revision_file: .revision
 
     # These files (from Git) will not be uploaded during a deploy
