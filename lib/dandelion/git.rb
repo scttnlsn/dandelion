@@ -63,7 +63,7 @@ module Dandelion
 
       def files
         @revision = "#{@revision}:#{@local_path}" unless @local_path.nil?
-        @repo.git.native(:ls_tree, {:name_only => true, :r => true}, @revision).split("\n")
+        @repo.git.native(:ls_tree, {:name_only => true, :full_tree => true, :r => true}, @revision).split("\n")
       end
 
       def show(file)
