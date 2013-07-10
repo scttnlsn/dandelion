@@ -19,7 +19,7 @@ module Dandelion
       def initialize(repo, backend, options = {})
         @repo = repo
         @backend = backend
-        @options = { :exclude => [], :additional => [], :revision => 'HEAD', :revision_file => '.revision', :local_path => '/' }.merge(options)
+        @options = { :exclude => [], :additional => [], :revision => 'HEAD', :revision_file => '.revision', :local_path => '' }.merge(options)
         @tree = Git::Tree.new(@repo, @options[:revision], @options[:local_path])
 
         if @options[:dry]
