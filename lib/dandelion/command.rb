@@ -118,13 +118,14 @@ module Dandelion
         begin
           backend ||= backend()
           revision_file = @config['revision_file'].nil? ? '.revision' : @config['revision_file']
+          local_path = @config['local_path'].nil? ? '' : @config['local_path']
           options = {
             :dry => @options[:dry],
             :exclude => @config['exclude'],
             :additional => @config['additional'],
             :revision => revision,
             :revision_file => revision_file,
-            :local_path     => @config['local_path'].nil? ? './' : @config['local_path']
+            :local_path => local_path
           }
 
           Deployment::Deployment.create(@repo, backend, options)
