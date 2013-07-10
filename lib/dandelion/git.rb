@@ -66,7 +66,6 @@ module Dandelion
       end
 
       def show(file)
-        # (@tree / file).data
         file
       end
 
