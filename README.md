@@ -30,11 +30,11 @@ Git repository is searched for a file named `dandelion.yml`). Example:
     # Optional
     # --------
 
-    # Local Path (defaults to repository root)
-    local_path: path/in/repo
-
     # Remote path
     path: path/to/deployment
+
+    # Local Path
+    local_path: path/in/repo
 
     # Remote file name in which the current revision is stored
     revision_file: .revision
@@ -67,7 +67,8 @@ Required:
 Optional:
 
  * `path`
- * `exclude`
+ * `local_path` (defaults to repository root)
+ * `exclude` (if local_path is set, files are relative to that path)
  * `additional`
  * `port`
  * `revision_file` (defaults to .revision)
@@ -84,7 +85,8 @@ Required:
 Optional:
 
  * `path`
- * `exclude`
+ * `local_path` (defaults to repository root)
+ * `exclude` (if local_path is set, files are relative to that path)
  * `additional`
  * `port`
  * `revision_file` (defaults to .revision)
@@ -101,7 +103,8 @@ Required:
 Optional:
 
  * `path`
- * `exclude`
+ * `local_path` (defaults to repository root)
+ * `exclude` (if local_path is set, files are relative to that path)
  * `additional`
  * `revision_file` (defaults to .revision)
 
