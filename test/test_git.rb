@@ -12,12 +12,6 @@ class TestGit < Test::Unit::TestCase
     assert_equal files.sort, tree.files.sort
   end
 
-  def test_tree_subfolder
-    tree = Dandelion::Git::Tree.new(@repo, 'HEAD', 'baz')
-    files = ['foo', 'bar', 'foo/bar']
-    assert_equal files.sort, tree.files.sort
-  end
-
   def test_tree_show
     tree = Dandelion::Git::Tree.new(@repo, 'HEAD', '')
     assert_equal "bar\n", tree.show('foo')
