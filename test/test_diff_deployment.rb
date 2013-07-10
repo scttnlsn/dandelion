@@ -20,7 +20,7 @@ end
 
 class MockFile
   attr_reader :data
-  
+
   def initialize(data)
     @data = data
   end
@@ -36,11 +36,11 @@ class MockCommit
   def initialize(revision)
     @revision = revision
   end
-  
+
   def tree
     MockTree.new
   end
-  
+
   def sha
     @revision
   end
@@ -50,7 +50,7 @@ class MockRepo
   def commit(revision)
     MockCommit.new(revision)
   end
-  
+
   def git
     MockGit.new
   end
@@ -58,21 +58,21 @@ end
 
 class MockBackend
   attr_reader :reads, :writes, :deletes
-  
+
   def initialize(remote_revision)
     @reads = {'.revision' => remote_revision}
     @writes = {}
     @deletes = []
   end
-  
+
   def read(file)
     @reads[file]
   end
-  
+
   def write(file, data)
     @writes[file] = data
   end
-  
+
   def delete(file)
     @deletes << file
   end
@@ -89,28 +89,28 @@ class TestDiffDeployment < Test::Unit::TestCase
     @backend = MockBackend.new(@remote_revision)
     @diff_deployment = Dandelion::Deployment::DiffDeployment.new(@repo, @backend, :revision => @head_revision)
   end
-  
+
   def test_diff_deployment_local_revision
     assert_equal @head_revision, @diff_deployment.local_revision
   end
-  
+
   def test_diff_deployment_remote_revision
     assert_equal @remote_revision, @diff_deployment.remote_revision
   end
-  
+
   def test_diff_deployment_write_revision
     @diff_deployment.write_revision
     assert_equal @head_revision, @backend.writes['.revision']
   end
-  
+
   def test_diff_deployment_revisions_match
     assert !@diff_deployment.revisions_match?
   end
-  
+
   def test_diff_deployment_any
     assert @diff_deployment.any?
   end
-  
+
   def test_diff_deployment_deploy
     @diff_deployment.deploy
     assert_equal 3, @backend.writes.length
