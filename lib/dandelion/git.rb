@@ -55,13 +55,14 @@ module Dandelion
       def initialize(repo, revision, local_path)
         @repo = repo
         @commit = @repo.commit(revision)
+        @revision = revision
         @local_path = local_path
         raise RevisionError if @commit.nil?
         @tree = @commit.tree
       end
 
       def files
-        Dir.chdir @local_path unless @local_path.nil?
+        @revision = "#{@revision}:#{@local_path}" unless @local_path.nil?
         @repo.git.native(:ls_files, {:base => false, :o => true, :c => true}).split("\n")
       end
 
