@@ -114,8 +114,8 @@ class TestDiffDeployment < Test::Unit::TestCase
   def test_diff_deployment_deploy
     @diff_deployment.deploy
     assert_equal 3, @backend.writes.length
-    assert_equal 'bar', @backend.writes['foo']
-    assert_equal 'bar', @backend.writes['baz/foo']
+    assert_equal 'foo', @backend.writes['foo']
+    assert_equal 'baz/foo', @backend.writes['baz/foo']
     assert_equal @head_revision, @backend.writes['.revision']
     assert_equal ['foobar'], @backend.deletes
   end
