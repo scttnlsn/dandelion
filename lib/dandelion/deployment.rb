@@ -80,7 +80,7 @@ module Dandelion
     class DiffDeployment < Deployment
       def initialize(repo, backend, options = {})
         super(repo, backend, options)
-        @diff = Git::Diff.new(@repo, read_remote_revision, @options[:revision])
+        @diff = Git::Diff.new(@repo, read_remote_revision, @options[:revision], @options[:local_path])
       end
 
       def remote_revision

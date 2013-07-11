@@ -16,10 +16,15 @@ module Dandelion
 
       @files = nil
 
-      def initialize(repo, from_revision, to_revision)
+      def initialize(repo, from_revision, to_revision, local_path)
         @repo = repo
+        @local_path = local_path
         @from_revision = from_revision
         @to_revision = to_revision
+        unless @local_path.nil? || @local_path.empty?
+          @from_revision = "#{@from_revision}:#{@local_path}"
+          @to_revision = "#{@to_revision}:#{@local_path}"
+        end
         begin
           @files = parse(diff)
         rescue Grit::Git::CommandFailed
@@ -38,7 +43,7 @@ module Dandelion
       private
 
       def diff
-        @repo.git.native(:diff, {:name_status => true, :raise => true}, from_revision, to_revision)
+        @repo.git.native(:diff, {:name_status => true, :raise => true}, @from_revision, @to_revision)
       end
 
       def parse(diff)
@@ -67,7 +72,7 @@ module Dandelion
       end
 
       def show(file)
-        (@tree / file).data
+        file
       end
 
       def revision
