@@ -67,12 +67,18 @@ module Dandelion
       end
 
       def files
-        @revision = "#{@revision}:#{@local_path}" unless @local_path.nil?
+        @revision = "#{@revision}:#{@local_path}" unless @local_path.nil? || @local_path.empty?
         @repo.git.native(:ls_tree, {:name_only => true, :full_tree => true, :r => true}, @revision).split("\n")
       end
 
       def show(file)
-        file
+        @file = file
+        @file = "#{@local_path}/#{file}" unless @local_path.nil? || @local_path.empty?
+        if (@tree / "#{@file}").is_a?(Grit::Submodule)
+          puts "#{file} is a submodule, ignoring."
+          return
+        end
+        (@tree / "#{@file}").data
       end
 
       def revision

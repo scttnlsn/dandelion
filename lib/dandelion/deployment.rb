@@ -107,8 +107,10 @@ module Dandelion
           if exclude_file?(file)
             log.debug("Skipping file: #{file}")
           else
-            log.debug("Uploading file: #{file}")
-            @backend.write(file, @tree.show(file))
+            if data = @tree.show(file)
+              log.debug("Uploading file: #{file}")
+              @backend.write(file, data)
+            end
           end
         end
       end
@@ -149,8 +151,10 @@ module Dandelion
           if exclude_file?(file)
             log.debug("Skipping file: #{file}")
           else
-            log.debug("Uploading file: #{file}")
-            @backend.write(file, @tree.show(file))
+            if data = @tree.show(file)
+              log.debug("Uploading file: #{file}")
+              @backend.write(file, data)
+            end
           end
         end
 

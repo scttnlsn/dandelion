@@ -20,8 +20,8 @@ class TestGit < Test::Unit::TestCase
 
   def test_tree_show
     tree = Dandelion::Git::Tree.new(@repo, 'HEAD', '')
-    assert_equal "foo", tree.show('foo')
-    assert_equal "baz/foo", tree.show('baz/foo')
+    assert_equal "bar\n", tree.show('foo')
+    assert_equal "bar\n", tree.show('baz/foo')
   end
 
   def test_tree_revision
