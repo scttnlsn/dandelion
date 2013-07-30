@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://github.com/scttnlsn/dandelion'
   s.summary     = "dandelion-#{s.version}"
   s.description = 'Incremental Git repository deployment'
+  s.license     = 'MIT'
   
   s.add_dependency 'grit', '>= 2.4.1'
   
