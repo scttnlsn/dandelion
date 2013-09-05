@@ -39,10 +39,11 @@ Git repository is searched for a file named `dandelion.yml`). Example:
     # Remote file name in which the current revision is stored
     revision_file: .revision
 
-    # These files (from Git) will not be uploaded during a deploy
+    # These files or folders (from Git) will not be uploaded during a deploy
     exclude:
         - .gitignore
         - dandelion.yml
+        - folder/
 
     # These files (from your working directory) will be uploaded on every deploy
     additional:
