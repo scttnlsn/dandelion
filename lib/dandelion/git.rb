@@ -19,12 +19,9 @@ module Dandelion
       def initialize(repo, from_revision, to_revision, local_path)
         @repo = repo
         @local_path = local_path
-        @from_revision = from_revision
-        @to_revision = to_revision
-        unless @local_path.nil? || @local_path.empty?
-          @from_revision = "#{@from_revision}:#{@local_path}"
-          @to_revision = "#{@to_revision}:#{@local_path}"
-        end
+        @from_revision = revision_string(from_revision)
+        @to_revision = revision_string(to_revision)
+
         begin
           @files = parse(diff)
         rescue Grit::Git::CommandFailed
@@ -43,7 +40,7 @@ module Dandelion
       private
 
       def diff
-        @repo.git.native(:diff, {:name_status => true, :raise => true}, @from_revision, @to_revision)
+        @repo.git.native(:diff, { :name_status => true, :raise => true }, @from_revision, @to_revision)
       end
 
       def parse(diff)
@@ -53,6 +50,14 @@ module Dandelion
           files[file] = status
         end
         files
+      end
+
+      def revision_string(revision)
+        if @local_path.nil? || @local_path.empty?
+          revision
+        else
+          "#{revision}:#{@local_path}"
+        end
       end
     end
 
@@ -67,22 +72,42 @@ module Dandelion
       end
 
       def files
-        @revision = "#{@revision}:#{@local_path}" unless @local_path.nil? || @local_path.empty?
-        @repo.git.native(:ls_tree, {:name_only => true, :full_tree => true, :r => true}, @revision).split("\n")
+        @repo.git.native(:ls_tree, { :name_only => true, :full_tree => true, :r => true }, revision_string).split("\n")
       end
 
       def show(file)
-        @file = file
-        @file = "#{@local_path}/#{file}" unless @local_path.nil? || @local_path.empty?
-        if (@tree / "#{@file}").is_a?(Grit::Submodule)
+        blob = @tree / file_path(file)
+        if blob.is_a?(Grit::Submodule)
           puts "#{file} is a submodule, ignoring."
-          return
+        else
+          blob.data
         end
-        (@tree / "#{@file}").data
       end
 
       def revision
         @commit.sha
+      end
+
+      private
+
+      def file_path(file)
+        if local_path?
+          File.join(@local_path, file)
+        else
+          file
+        end
+      end
+
+      def revision_string
+        if local_path?
+          "#{@revision}:#{@local_path}"
+        else
+          @revision
+        end
+      end
+
+      def local_path?
+        !@local_path.nil? && !@local_path.empty?
       end
     end
   end
