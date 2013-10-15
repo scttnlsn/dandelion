@@ -24,21 +24,23 @@ Git repository is searched for a file named `dandelion.yml`).
 
 Example:
 
-    scheme: sftp
-    host: example.com
-    username: user
-    password: pass
-    path: path/to/deployment
+```yaml
+scheme: sftp
+host: example.com
+username: user
+password: pass
+path: path/to/deployment
 
-    exclude:
-        - .gitignore
-        - dandelion.yml
-        - folder/
+exclude:
+    - .gitignore
+    - dandelion.yml
+    - folder/
 
-    additional:
-        - public/css/print.css
-        - public/css/screen.css
-        - public/js/main.js
+additional:
+    - public/css/print.css
+    - public/css/screen.css
+    - public/js/main.js
+```
 
 Required:
 
