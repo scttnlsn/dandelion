@@ -112,3 +112,12 @@ module Dandelion
     end
   end
 end
+
+# Grit does not support Ruby 2.0 right now
+class String
+  if ((defined? RUBY_VERSION) && (RUBY_VERSION[0..2] == "1.9" || RUBY_VERSION[0].to_i >= 2))
+    def getord(offset); self[offset].ord; end
+  else
+    alias :getord :[]
+  end
+end
