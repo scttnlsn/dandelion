@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Dandelion by scttnlsn</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Dandelion</h1>
+        <p>Incremental Git repository deployment.</p>
+
+        <p class="view"><a href="https://github.com/scttnlsn/dandelion">View the Project on GitHub <small>scttnlsn/dandelion</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/scttnlsn/dandelion/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/scttnlsn/dandelion/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/scttnlsn/dandelion">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="dandelion" class="anchor" href="#dandelion"><span class="octicon octicon-link"></span></a>Dandelion</h1>
+
+<p>Incremental Git repository deployment.</p>
+
+<h2>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>Ensure that Ruby is installed, then run:</p>
+
+<pre><code>$ gem install dandelion
+</code></pre>
+
+<p>Alternatively, you can build the gem yourself:</p>
+
+<pre><code>$ git clone git://github.com/scttnlsn/dandelion.git
+$ cd dandelion
+$ rake install
+</code></pre>
+
+<h2>
+<a name="config" class="anchor" href="#config"><span class="octicon octicon-link"></span></a>Config</h2>
+
+<p>Configuration options are specified in a YAML file (by default, the root of your
+Git repository is searched for a file named <code>dandelion.yml</code>).</p>
+
+<p>Example:</p>
+
+<div class="highlight highlight-yaml"><pre><span class="l-Scalar-Plain">scheme</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">sftp</span>
+<span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">example.com</span>
+<span class="l-Scalar-Plain">username</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">user</span>
+<span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">pass</span>
+<span class="l-Scalar-Plain">path</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">path/to/deployment</span>
+
+<span class="l-Scalar-Plain">exclude</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">.gitignore</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">dandelion.yml</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">folder/</span>
+
+<span class="l-Scalar-Plain">additional</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">public/css/print.css</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">public/css/screen.css</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">public/js/main.js</span>
+</pre></div>
+
+<p>Required:</p>
+
+<ul>
+<li>
+<code>scheme</code> (the file transfer scheme, see below)</li>
+</ul><p>Optional:</p>
+
+<ul>
+<li>
+<code>path</code> (relative path from root of remote file tree, defaults to the root)</li>
+<li>
+<code>local_path</code> (relative path from root of local repository, defaults to repository root)</li>
+<li>
+<code>exclude</code> (list of files or directories to exclude from deployment, if <code>local_path</code> is set files are relative to that path)</li>
+<li>
+<code>additional</code> (additional list of files from your working directory that will be deployed)</li>
+<li>
+<code>revision_file</code> (remote file in which revision SHA is stored, defaults to .revision)</li>
+</ul><p>Each scheme also has additional required and optional configuration parameters (see below).</p>
+
+<h2>
+<a name="schemes" class="anchor" href="#schemes"><span class="octicon octicon-link"></span></a>Schemes</h2>
+
+<p>There is support for multiple backend file transfer schemes.  The configuration
+must specify one of these schemes and the set of additional parameters required
+by the given scheme.</p>
+
+<p><strong>SFTP</strong>: <code>scheme: sftp</code></p>
+
+<p>Required:</p>
+
+<ul>
+<li><code>host</code></li>
+<li><code>username</code></li>
+<li><code>password</code></li>
+</ul><p>Optional:</p>
+
+<ul>
+<li>
+<code>port</code> (defaults to 22)</li>
+<li>
+<code>preserve_permissions</code> (defaults to true)</li>
+</ul><p><strong>FTP</strong>: <code>scheme: ftp</code></p>
+
+<p>Required:</p>
+
+<ul>
+<li><code>host</code></li>
+<li><code>username</code></li>
+<li><code>password</code></li>
+</ul><p>Optional:</p>
+
+<ul>
+<li>
+<code>port</code> (defaults to 21)</li>
+<li>
+<code>passive</code> (defaults to true)</li>
+</ul><p><strong>Amazon S3</strong>: <code>scheme: s3</code></p>
+
+<p>Required:</p>
+
+<ul>
+<li><code>access_key_id</code></li>
+<li><code>secret_access_key</code></li>
+<li><code>bucket_name</code></li>
+</ul><h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>From within your Git repository, run:</p>
+
+<pre><code>$ dandelion deploy
+</code></pre>
+
+<p>This will deploy the local <code>HEAD</code> revision to the location specified in the config
+file.  Dandelion keeps track of the currently deployed revision so that only files
+which have been added/changed/deleted need to be transferred.</p>
+
+<p>You can specify the revision you wish to deploy and Dandelion will determine which
+files need to be transferred:</p>
+
+<pre><code>$ dandelion deploy &lt;revision&gt;
+</code></pre>
+
+<p>For a more complete summary of usage options, run:</p>
+
+<pre><code>$ dandelion -h
+Usage: dandelion [options] &lt;command&gt; [&lt;args&gt;]
+    -v, --version                    Display the current version
+    -h, --help                       Display this screen
+        --repo=[REPO]                Use the given repository
+        --config=[CONFIG]            Use the given configuration file
+
+Available commands:
+    deploy
+    status
+</code></pre>
+
+<p>Note that when specifying the repository or configuration file, the given paths
+are relative to the current working directory (not the repository root).  To see
+the options for a particular command, run:</p>
+
+<pre><code>$ dandelion &lt;command&gt; -h
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/scttnlsn">scttnlsn</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-44029969-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
