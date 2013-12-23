@@ -1,7 +1,7 @@
 Dandelion
 =========
 
-Incremental Git repository deployment.
+Incremental Git repository deployment for OS X and Linux.
 
 Install
 -------
