@@ -59,8 +59,15 @@ module Dandelion
         end
 
         @options[:additional].each do |file|
-          log.debug("Uploading additional file: #{file}")
-          @backend.write(file, IO.read(file))
+          local_path = file
+          remote_path = file
+
+          if file.is_a?(Hash)
+            local_path, remote_path = file.first
+          end
+
+          log.debug("Uploading additional file: #{local_path} -> #{remote_path}")
+          @backend.write(remote_path, IO.read(local_path))
         end
       end
 
