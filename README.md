@@ -1,5 +1,8 @@
 Dandelion
 =========
+[![Gem Version](https://badge.fury.io/rb/dandelion.png)](http://badge.fury.io/rb/dandelion)
+[![Dependency Status](https://gemnasium.com/scttnlsn/dandelion.png)](https://gemnasium.com/scttnlsn/dandelion)
+[![Code Climate](https://codeclimate.com/github/scttnlsn/dandelion.png)](https://codeclimate.com/github/scttnlsn/dandelion)
 
 Incremental Git repository deployment for OS X and Linux.
 
