@@ -11,6 +11,7 @@ module Dandelion
         @access_key_id = config['access_key_id']
         @secret_access_key = config['secret_access_key']
         @bucket_name = config['bucket_name']
+        @host = config['host']
         @path = config['path']
       end
 
@@ -37,7 +38,14 @@ module Dandelion
       protected
       
       def s3connect!
-        AWS::S3::Base.establish_connection!(:access_key_id => @access_key_id, :secret_access_key => @secret_access_key, :use_ssl => true) unless AWS::S3::Base.connected? 
+        options = {
+          :access_key_id => @access_key_id,
+          :secret_access_key => @secret_access_key,
+          :use_ssl => true
+        }
+
+        options[:server] = @host if @host
+        AWS::S3::Base.establish_connection!(options) unless AWS::S3::Base.connected?
       end
             
       def path(file)

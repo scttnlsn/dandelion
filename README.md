@@ -100,6 +100,10 @@ Required:
  * `secret_access_key`
  * `bucket_name`
 
+Optional:
+
+* `host` (defaults to s3.amazonaws.com)
+
 Usage
 -----
 
