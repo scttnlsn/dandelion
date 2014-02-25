@@ -1,16 +1,17 @@
 module Dandelion
   class Deployer
-    def initialize(repo, adapter)
+    def initialize(repo, adapter, options = {})
       @repo = repo
       @adapter = adapter
+      @options = options
     end
 
     def deploy!(diff)
-      diff.changed.each do |path|
+      diff.changed.reject(&method(:exclude?)).each do |path|
         @adapter.write(path, data(diff.to.tree, path))
       end
 
-      diff.deleted.each do |path|
+      diff.deleted.reject(&method(:exclude?)).each do |path|
         @adapter.delete(path)
       end
     end
@@ -26,6 +27,11 @@ module Dandelion
       end
 
       object.read_raw.data
+    end
+
+    def exclude?(path)
+      excluded = @options[:exclude] || []
+      excluded.map { |e| path.start_with?(e) }.any?
     end
   end
 end

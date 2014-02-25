@@ -15,5 +15,18 @@ describe Dandelion::Deployer do
 
       deployer.deploy!(test_diff)
     end
+
+    context 'exclude' do
+      let(:deployer) { Dandelion::Deployer.new(test_repo, adapter, exclude: ['baz']) }
+
+      it 'perfoms writes and deletions on adapter' do
+        adapter.should_receive(:write).with('foo', "foo\n")
+        adapter.should_receive(:write).with('qux', '')
+
+        adapter.should_receive(:delete).with('bar')
+
+        deployer.deploy!(test_diff)
+      end
+    end
   end
 end
