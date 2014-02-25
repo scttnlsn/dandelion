@@ -1,7 +1,0 @@
-#!/usr/bin/env ruby
-
-$:.unshift(File.dirname(__FILE__) + '/../lib') unless $:.include?(File.dirname(__FILE__) + '/../lib')
-
-require 'dandelion/application'
-
-Dandelion::Application.execute(ARGV.dup)
