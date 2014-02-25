@@ -14,6 +14,10 @@ module Dandelion
       lookup(remote_sha)
     end
 
+    def remote_commit=(commit)
+      self.remote_sha = commit.oid
+    end
+
     def diff
       Diff.new(remote_commit, local_commit)
     end
@@ -38,6 +42,10 @@ module Dandelion
 
     def remote_sha
       @adapter.read(@options[:revision_file])
+    end
+
+    def remote_sha=(sha)
+      @adapter.write(@options[:revision_file], sha)
     end
   end
 end

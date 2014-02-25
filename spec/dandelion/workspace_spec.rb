@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Dandelion::Workspace do
-  let!(:adapter) { Object.new }
+  let!(:adapter) { double('adapter') }
   let!(:workspace) { Dandelion::Workspace.new(test_repo, adapter) }
 
   let!(:head_ref) { '3d9b743acb4a84dd99002d2c6f3fcf1a47e9f06b' }
@@ -38,6 +38,13 @@ describe Dandelion::Workspace do
 
     it 'returns commit for ref read from adapter' do
       expect(workspace.remote_commit.oid).to eq initial_ref
+    end
+  end
+
+  describe '#remote_commit=' do
+    it 'writes commit ref to adapter' do
+      adapter.should_receive(:write).with('.revision', head_ref)
+      workspace.remote_commit = workspace.local_commit
     end
   end
 
