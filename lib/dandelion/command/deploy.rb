@@ -1,11 +1,11 @@
 module Dandelion
   module Command
     class Deploy < Command::Base
-      command 'deploy'
+      command :deploy
 
       def self.parser(options)
         OptionParser.new do |opts|
-          opts.banner = 'Usage: deploy [options] [<revision>]'
+          opts.banner = 'Usage: dandelion deploy [options] [<revision>]'
 
           options[:dry] = false
           opts.on('--dry-run', 'Show what would have been deployed') do
