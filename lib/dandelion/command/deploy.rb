@@ -36,7 +36,7 @@ module Dandelion
           log.info("No changes to deploy")
         else
           deployer.deploy!(workspace.diff)
-          workspace.remote_commit = workspace.local_commit
+          workspace.remote_commit = workspace.local_commit unless options[:dry]
         end
       end
     end
