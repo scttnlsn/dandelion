@@ -48,14 +48,25 @@ describe Dandelion::Command::Deploy do
     let(:deployer) { double() }
     let(:diff) { double() }
     let(:workspace) { double() }
+    let(:adapter) { double() }
+    let(:local_commit) { double() }
 
     let(:command) { Dandelion::Command::Deploy.new }
 
-    it 'deploys workspace diff' do
+    before(:each) do
+      diff.stub(:empty?).and_return(false)
+      
       workspace.stub(:diff).and_return(diff)
+      workspace.stub(:local_commit).and_return(local_commit)
+
+      command.stub(:adapter).and_return(adapter)
       command.stub(:deployer).and_return(deployer)
       command.stub(:workspace).and_return(workspace)
+    end
+
+    it 'deploys workspace diff and sets remote commit' do
       deployer.should_receive(:deploy!).with(diff)
+      workspace.should_receive(:remote_commit=).with(workspace.local_commit)
       command.execute!
     end
   end

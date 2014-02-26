@@ -1,3 +1,4 @@
+require 'optparse'
 require 'yaml'
 
 module Dandelion
@@ -10,10 +11,12 @@ module Dandelion
           @@commands[name] = self
         end
 
-        def create_command(name, options = {})
-          klass = @@commands[name]
-          return nil if klass.nil?
-          klass.new(options)
+        def commands
+          @@commands.keys
+        end
+
+        def lookup(name)
+          @@commands[name]
         end
 
         def parser(options)
@@ -49,8 +52,16 @@ module Dandelion
         @options = options
       end
 
+      def setup(args)
+      end
+
       def config
-        @config ||= YAML.load_file(@options[:config])
+        return @config if @config
+
+        @config = {}
+        data = YAML.load_file(@options[:config]) || {}
+        data.each_pair { |k, v| @config[k.to_sym] = v }
+        @config
       end
 
       def repo
@@ -58,11 +69,15 @@ module Dandelion
       end
 
       def adapter
-        @adapter ||= Adapter::Base.create_adapter(config[:adapter])
+        @adapter ||= Adapter::Base.create_adapter(config[:adapter], config)
       end
 
       def workspace
         @workspace ||= Workspace.new(repo, adapter, config)
+      end
+
+      def log
+        Dandelion.logger
       end
     end
   end

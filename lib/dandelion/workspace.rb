@@ -7,11 +7,12 @@ module Dandelion
     end
 
     def local_commit
-      lookup(ref)
+      lookup(revision)
     end
 
     def remote_commit
-      lookup(remote_sha)
+      sha = remote_sha
+      sha ? lookup(remote_sha) : nil
     end
 
     def remote_commit=(commit)
@@ -28,13 +29,13 @@ module Dandelion
       { revision_file: '.revision', local_path: '' }
     end
 
-    def ref
-      @options[:ref] || @repo.head.target
+    def revision
+      @options[:revision] || @repo.head.target
     end
 
-    def lookup(ref)
+    def lookup(val)
       begin
-        @repo.lookup(ref)
+        @repo.lookup(val)
       rescue Rugged::OdbError
         nil
       end

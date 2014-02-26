@@ -1,6 +1,8 @@
 require 'dandelion'
 require 'rugged'
 
+Dandelion.logger.level = Logger::UNKNOWN
+
 def test_repo
   path = File.join(File.dirname(__FILE__), 'fixtures', 'repo.git')
   @repo ||= Rugged::Repository.new(path)

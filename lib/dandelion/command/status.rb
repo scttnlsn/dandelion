@@ -10,6 +10,12 @@ module Dandelion
       end
 
       def execute!
+        log.info("Connecting to #{adapter.to_s}")
+
+        remote_commit = workspace.remote_commit
+
+        log.info("Remote revision:      #{remote_commit ? remote_commit.oid : '---'}")
+        log.info("Local HEAD revision:  #{workspace.local_commit.oid}")
       end
     end
   end

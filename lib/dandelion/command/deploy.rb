@@ -16,15 +16,28 @@ module Dandelion
 
       def deployer
         if options[:dry]
-          noop_adapter = Adapter::NoOpAdapter.new
+          noop_adapter = Adapter::NoOpAdapter.new(config)
           Deployer.new(repo, noop_adapter, config)
         else
           Deployer.new(repo, adapter, config)
         end
       end
 
+      def setup(args)
+        config[:revision] = args.shift || nil
+      end
+
       def execute!
-        deployer.deploy!(workspace.diff)
+        log.info("Connecting to #{adapter.to_s}")
+
+        diff = workspace.diff
+
+        if diff.empty?
+          log.info("No changes to deploy")
+        else
+          deployer.deploy!(workspace.diff)
+          workspace.remote_commit = workspace.local_commit
+        end
       end
     end
   end

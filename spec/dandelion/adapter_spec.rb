@@ -24,7 +24,6 @@ describe Dandelion::Adapter::Base do
       adapter :test
 
       def initialize(options)
-        super
         raise LoadError
       end
     end

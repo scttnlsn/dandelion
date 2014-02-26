@@ -6,14 +6,14 @@ describe Dandelion::Command::Base do
       command :test
     end
 
-    expect(Dandelion::Command::Base.create_command(:test)).to be_a(TestCommand)
+    expect(Dandelion::Command::Base.lookup(:test)).to eq TestCommand
   end
 
   describe '#config' do
     let(:command) { Dandelion::Command::Base.new(config: 'foo') }
 
     it 'parses yaml config file' do
-      config = double()
+      config = {}
       YAML.should_receive(:load_file).with('foo').and_return(config)
       expect(command.config).to eq config
     end
@@ -36,7 +36,7 @@ describe Dandelion::Command::Base do
       command.stub(:config).and_return(adapter: 'foo')
 
       adapter = double();
-      Dandelion::Adapter::Base.should_receive(:create_adapter).with('foo').and_return(adapter)
+      Dandelion::Adapter::Base.should_receive(:create_adapter).with('foo', command.config).and_return(adapter)
       expect(command.adapter).to eq adapter
     end
   end

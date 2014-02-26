@@ -34,11 +34,11 @@ module Dandelion
         end
       end
 
-      def initialize(options)
-        @options = options
+      def initialize(config)
       end
     end
   end
 end
 
 require 'dandelion/adapter/noop'
+require 'dandelion/adapter/s3'
