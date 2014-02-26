@@ -5,20 +5,48 @@ module Dandelion
     extend ::Forwardable
 
     def_delegator :@target, :empty?
-    def_delegator :@target, :changed
-    def_delegator :@target, :deleted
 
     attr_reader :from, :to
 
-    def initialize(from_commit, to_commit)
+    def initialize(from_commit, to_commit, options = {})
       @from = from_commit
       @to = to_commit
+      @options = options
 
       if from_commit.nil?
         @target = FullDiff.new(to_commit.diff(nil))
       else
         @target = PartialDiff.new(from_commit.diff(to_commit))
       end
+    end
+
+    def changed
+      transformed_paths(@target.changed)
+    end
+
+    def deleted
+      transformed_paths(@target.deleted)
+    end
+
+  private
+
+    def transformed_paths(paths)
+      paths.select(&method(:applicable?)).map(&method(:trim_path))
+    end
+
+    def local_path
+      @options[:local_path] || ''
+    end
+
+    def applicable?(path)
+      path.start_with?(local_path)
+    end
+
+    def trim_path(path)
+      return path unless applicable?(path)
+      trimmed = path[local_path.length..-1]
+      trimmed = trimmed[1..-1] if trimmed[0] == File::SEPARATOR
+      trimmed
     end
   end
 

@@ -47,4 +47,15 @@ describe Dandelion::Diff do
       end
     end
   end
+
+  context 'local path' do
+    let(:diff) { Dandelion::Diff.new(from_commit, to_commit, local_path: 'baz') }
+
+    describe '#changed' do
+      it 'returns relative paths that have changed between commits' do
+        expect(diff.changed).to include 'bar'
+        expect(diff.changed.length).to eq 1
+      end
+    end
+  end
 end

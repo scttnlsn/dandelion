@@ -19,13 +19,13 @@ module Dandelion
     end
 
     def diff
-      Diff.new(remote_commit, local_commit)
+      Diff.new(remote_commit, local_commit, local_path: @options[:local_path])
     end
 
   private
 
     def default_options
-      { revision_file: '.revision' }
+      { revision_file: '.revision', local_path: '' }
     end
 
     def ref
