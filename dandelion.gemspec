@@ -12,10 +12,10 @@ Gem::Specification.new do |s|
   s.homepage         = 'https://github.com/scttnlsn/dandelion'
   s.license          = 'MIT'
 
-  spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = ['lib']
+  s.files         = `git ls-files`.split($/)
+  s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.test_files    = s.files.grep(%r{^(test|spec|features)/})
+  s.require_paths = ['lib']
 
   s.post_install_message = <<-MSG
   !   The 'dandelion' gem is installed but you may need to install additional
