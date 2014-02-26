@@ -40,3 +40,5 @@ module Dandelion
     end
   end
 end
+
+require 'dandelion/adapter/noop'

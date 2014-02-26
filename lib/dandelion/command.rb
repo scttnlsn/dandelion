@@ -43,7 +43,9 @@ module Dandelion
         end
       end
 
-      def initialize(options)
+      attr_reader :options
+
+      def initialize(options = {})
         @options = options
       end
 
@@ -54,6 +56,16 @@ module Dandelion
       def repo
         @repo ||= Rugged::Repository.new(@options[:repo])
       end
+
+      def adapter
+        @adapter ||= Adapter::Base.create_adapter(config[:adapter])
+      end
+
+      def workspace
+        @workspace ||= Workspace.new(repo, adapter, config)
+      end
     end
   end
 end
+
+require 'dandelion/command/deploy'

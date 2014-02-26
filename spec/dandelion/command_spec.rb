@@ -13,8 +13,9 @@ describe Dandelion::Command::Base do
     let(:command) { Dandelion::Command::Base.new(config: 'foo') }
 
     it 'parses yaml config file' do
-      YAML.should_receive(:load_file).with('foo').and_return('bar')
-      expect(command.config).to eq 'bar'
+      config = double()
+      YAML.should_receive(:load_file).with('foo').and_return(config)
+      expect(command.config).to eq config
     end
   end
 
@@ -22,8 +23,39 @@ describe Dandelion::Command::Base do
     let(:command) { Dandelion::Command::Base.new(repo: 'foo') }
 
     it 'creates repository object' do
-      Rugged::Repository.should_receive(:new).with('foo').and_return('bar')
-      expect(command.repo).to eq 'bar'
+      repo = double()
+      Rugged::Repository.should_receive(:new).with('foo').and_return(repo)
+      expect(command.repo).to eq repo
+    end
+  end
+
+  describe '#adapter' do
+    let(:command) { Dandelion::Command::Base.new }
+
+    it 'creates adapter object from config' do
+      command.stub(:config).and_return(adapter: 'foo')
+
+      adapter = double();
+      Dandelion::Adapter::Base.should_receive(:create_adapter).with('foo').and_return(adapter)
+      expect(command.adapter).to eq adapter
+    end
+  end
+
+  describe '#workspace' do
+    let(:repo) { double() }
+    let(:adapter) { double() }
+    let(:config) { double() }
+
+    let(:command) { Dandelion::Command::Base.new }
+
+    it 'creates workspace from repo and adapter' do
+      command.stub(:repo).and_return(repo)
+      command.stub(:adapter).and_return(adapter)
+      command.stub(:config).and_return(config)
+
+      workspace = double()
+      Dandelion::Workspace.should_receive(:new).with(repo, adapter, config).and_return(workspace)
+      expect(command.workspace).to eq workspace
     end
   end
 
