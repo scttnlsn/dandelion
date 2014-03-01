@@ -32,8 +32,14 @@ module Dandelion
         if changeset.empty?
           log.info("No changes to deploy")
         else
-          deployer.deploy!(workspace.changeset)
+          log.info("Deploying changes...")
+          deployer.deploy_changeset!(workspace.changeset)
           workspace.remote_commit = workspace.local_commit unless options[:dry]
+        end
+
+        if config[:additional] && config[:additional].length > 0
+          log.info("Deploying additional files...")
+          deployer.deploy_files!(config[:additional])
         end
       end
 

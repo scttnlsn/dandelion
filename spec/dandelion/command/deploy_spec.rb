@@ -77,17 +77,33 @@ describe Dandelion::Command::Deploy do
 
     context 'non-empty changeset' do
       before(:each) do
-        deployer.stub(:deploy!)
+        deployer.stub(:deploy_changeset!)
         changeset.stub(:empty?).and_return(false)
       end
 
       it 'deploys changeset' do
-        deployer.should_receive(:deploy!).with(changeset)
+        deployer.should_receive(:deploy_changeset!).with(changeset)
         command.execute!
       end
 
       it 'sets remote revision to local revision' do
         workspace.should_receive(:remote_commit=).with(workspace.local_commit)
+        command.execute!
+      end
+    end
+
+    context 'non-empty additional files' do
+      before(:each) do
+        changeset.stub(:empty?).and_return(true)
+      end
+
+      before(:each) do
+        deployer.stub(:deploy_files!)
+        config[:additional] = ['foo']
+      end
+
+      it 'deploys files' do
+        deployer.should_receive(:deploy_files!).with(['foo'])
         command.execute!
       end
     end

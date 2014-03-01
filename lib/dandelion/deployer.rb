@@ -5,7 +5,7 @@ module Dandelion
       @options = options
     end
 
-    def deploy!(changeset)
+    def deploy_changeset!(changeset)
       changeset.each do |change|
         if exclude?(change.path)
           log.debug("Skipping file: #{change.path}")
@@ -19,6 +19,19 @@ module Dandelion
             @adapter.delete(change.path)
           end
         end
+      end
+    end
+
+    def deploy_files!(files)
+      files.each do |path|
+        local_path = remote_path = path
+
+        if path.is_a?(Hash)
+          local_path, remote_path = path.first
+        end
+
+        log.debug("Writing file:  #{local_path} -> #{remote_path}")
+        @adapter.write(remote_path, IO.read(local_path))
       end
     end
 
