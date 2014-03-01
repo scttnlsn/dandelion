@@ -18,11 +18,11 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.post_install_message = <<-MSG
-  !   The 'dandelion' gem is installed but you may need to install additional
-  !   gems depending on the schemes you intend to use.
-  !
-  !   Running 'dandelion status' in your project directory will indicate which
-  !   additional gems need to be installed.
+!   The 'dandelion' gem is installed but you may need to install additional
+!   gems depending on the adapters you intend to use.
+!
+!   Running 'dandelion status' in your project directory will indicate which
+!   additional gems need to be installed.
   MSG
 
   s.add_dependency 'rugged', '~> 0.19.0'
