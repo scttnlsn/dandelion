@@ -1,10 +1,18 @@
+require 'dandelion/utils'
+
 module Dandelion
   module Adapter
     class FTP < Adapter::Base
+      include ::Dandelion::Utils
+
       adapter 'ftp'
       
       def initialize(config)
         require 'net/ftp'
+
+        @config = config
+        @config.defaults(port: Net::FTP::FTP_PORT)
+        @config[:passive] = to_b(@config[:passive])
 
         @ftp = ftp_client
       end
@@ -37,17 +45,17 @@ module Dandelion
       end
       
       def to_s
-        "ftp://#{config['username']}@#{config['host']}/#{config['path']}"
+        "ftp://#{@config['username']}@#{@config['host']}/#{@config['path']}"
       end
 
       private
 
       def ftp_client
         ftp = Net::FTP.new
-        ftp.connect(config['host'], config['port'] || Net::FTP::FTP_PORT)
-        ftp.login(config['username'], config['password'])
-        ftp.passive = config['passive'].nil? ? true : to_b(config['passive'])
-        ftp.chdir(config['path']) if config['path']
+        ftp.connect(@config['host'], @config['port'])
+        ftp.login(@config['username'], @config['password'])
+        ftp.passive = @config['passive']
+        ftp.chdir(@config['path']) if @config['path']
       end
 
       def cleanup(dir)

@@ -1,16 +1,21 @@
 require 'pathname'
+require 'dandelion/utils'
 
 module Dandelion
   module Adapter
     class SFTP < Adapter::Base
+      include ::Dandelion::Utils
+
       adapter 'sftp'
       requires_gems 'net-sftp'
       
       def initialize(config)
         require 'net/sftp'
 
+        @config = config
+        @config.defaults(preserve_permissions: true)
+
         @sftp = sftp_client
-        config.defaults(preserve_permissions: true)
       end
 
       def read(file)
@@ -35,7 +40,7 @@ module Dandelion
           end
         end
 
-        if config[:preserve_permissions]
+        if @config[:preserve_permissions]
           mode = get_mode(file)
           @sftp.setstat!(path(file), permissions: mode) if mode
         end
@@ -51,18 +56,18 @@ module Dandelion
       end
       
       def to_s
-        "sftp://#{config['username']}@#{config['host']}/#{config['path']}"
+        "sftp://#{@config['username']}@#{@config['host']}/#{@config['path']}"
       end
 
       private
 
       def sftp_client
         options = {
-          password: config['password'],
-          port: config['port'] || Net::SSH::Transport::Session::DEFAULT_PORT,
+          password: @config['password'],
+          port: @config['port'] || Net::SSH::Transport::Session::DEFAULT_PORT,
         }
 
-        Net::SFTP.start(config['host'], config['username'], options)
+        Net::SFTP.start(@config['host'], @config['username'], options)
       end
 
       def get_mode(file)
@@ -75,7 +80,7 @@ module Dandelion
       end
 
       def cleanup(dir)
-        unless cleanpath(dir) == cleanpath(config['path']) or dir == File.dirname(dir)
+        unless cleanpath(dir) == cleanpath(@config['path']) or dir == File.dirname(dir)
           if empty?(dir)
             sftp.rmdir!(dir)
             cleanup(File.dirname(dir))
@@ -100,8 +105,8 @@ module Dandelion
       end
       
       def path(file)
-        if config['path'] and !config['path'].empty?
-          File.join(config['path'], file)
+        if @config['path'] and !@config['path'].empty?
+          File.join(@config['path'], file)
         else
           file
         end
