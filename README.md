@@ -9,7 +9,7 @@ Incremental Git repository deployment.
 Install
 -------
 
-Ensure that Ruby is installed, then run:
+Ensure that Ruby >= 1.9 is installed, then run:
 
     $ gem install dandelion
 
