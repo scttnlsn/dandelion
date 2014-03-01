@@ -1,6 +1,7 @@
 Dandelion
 =========
 [![Gem Version](https://badge.fury.io/rb/dandelion.png)](http://badge.fury.io/rb/dandelion)
+[![Build Status](https://travis-ci.org/scttnlsn/dandelion.png)](https://travis-ci.org/scttnlsn/dandelion)
 [![Dependency Status](https://gemnasium.com/scttnlsn/dandelion.png)](https://gemnasium.com/scttnlsn/dandelion)
 [![Code Climate](https://codeclimate.com/github/scttnlsn/dandelion.png)](https://codeclimate.com/github/scttnlsn/dandelion)
 
