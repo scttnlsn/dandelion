@@ -66,5 +66,10 @@ describe Dandelion::Command::Base do
       parser.order!(['--config=foo'])
       expect(options[:config]).to eq 'foo'
     end
+
+    it 'parses log level' do
+      parser.order!(['--log=warn'])
+      expect(Dandelion.logger.level).to eq Logger::WARN
+    end
   end
 end

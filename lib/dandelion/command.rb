@@ -44,6 +44,18 @@ module Dandelion
             opts.on('--config=[CONFIG]', 'Use the given config file') do |config|
               options[:config] = config
             end
+
+            opts.on('--log=[level]', 'Use the given log level (fatal, error, warn, info, debug)') do |level|
+              levels = {
+                fatal: Logger::FATAL,
+                error: Logger::ERROR,
+                warn: Logger::WARN,
+                info: Logger::INFO,
+                debug: Logger::DEBUG
+              }
+
+              Dandelion.logger.level = levels[level.to_sym]
+            end
           end
         end
       end
