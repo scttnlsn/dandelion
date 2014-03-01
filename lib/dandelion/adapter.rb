@@ -40,4 +40,6 @@ module Dandelion
 end
 
 require 'dandelion/adapter/noop'
+require 'dandelion/adapter/ftp'
+require 'dandelion/adapter/sftp'
 require 'dandelion/adapter/s3'

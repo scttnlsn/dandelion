@@ -9,7 +9,7 @@ module Dandelion
     end
 
     def config
-      @config ||= Config.new(config_path).tap do |config|
+      @config ||= Config.new(path: config_path).tap do |config|
         config[:adapter] ||= config[:scheme] # backward compat
       end
     end

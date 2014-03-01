@@ -2,11 +2,11 @@ require 'yaml'
 
 module Dandelion
   class Config
-    attr_reader :data
+    attr_reader :path, :data
     
-    def initialize(path)
-      @path = path
-      @data = YAML.load_file(path) || {}
+    def initialize(options = {})
+      @path = options[:path]
+      @data = @path ? load : (options[:data] || {})
     end
 
     def [](key)
@@ -17,9 +17,20 @@ module Dandelion
       @data[key.to_s] = value
     end
 
-    def merge(data)
-      @data = @data.merge(data)
+    def defaults(values)
+      values.each do |k, v|
+        if self[k].nil?
+          self[k] = v
+        end
+      end
+
       self
+    end
+
+  private
+
+    def load
+      YAML.load_file(path) || {}
     end
   end
 end

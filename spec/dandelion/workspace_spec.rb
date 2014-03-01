@@ -69,7 +69,7 @@ describe Dandelion::Workspace do
       workspace.stub(:tree).and_return(tree)
       workspace.stub(:remote_commit).and_return(remote_commit)
 
-      Dandelion::Changeset.should_receive(:new).with(tree, remote_commit).and_return(changeset)
+      Dandelion::Changeset.should_receive(:new).with(tree, remote_commit, workspace.config).and_return(changeset)
 
       expect(workspace.changeset).to eq changeset
     end

@@ -2,12 +2,19 @@ module Dandelion
   class RevisionError < StandardError; end
 
   class Workspace
-    attr_reader :adapter
+    attr_reader :adapter, :config
     
-    def initialize(repo, adapter, config = {})
+    def initialize(repo, adapter, config = nil)
       @repo = repo
       @adapter = adapter
-      @config = config.merge(default_options)
+
+      if config.is_a?(Hash)
+        @config = Config.new(data: config)
+      else
+        @config = config || Config.new
+      end
+
+      @config.defaults(revision_file: '.revision', local_path: '')
     end
 
     def tree
@@ -15,7 +22,7 @@ module Dandelion
     end
 
     def changeset
-      Changeset.new(tree, remote_commit)
+      Changeset.new(tree, remote_commit, @config)
     end
 
     def local_commit
@@ -32,10 +39,6 @@ module Dandelion
     end
 
   private
-
-    def default_options
-      { revision_file: '.revision', local_path: '' }
-    end
 
     def lookup(val)
       begin
