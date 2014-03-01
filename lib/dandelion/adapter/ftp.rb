@@ -19,7 +19,7 @@ module Dandelion
 
       def read(file)
         begin
-          @ftp.getbinaryfile(file)
+          @ftp.getbinaryfile(file, nil)
         rescue Net::FTPPermError => e
           nil
         end
@@ -56,6 +56,7 @@ module Dandelion
         ftp.login(@config['username'], @config['password'])
         ftp.passive = @config['passive']
         ftp.chdir(@config['path']) if @config['path']
+        ftp
       end
 
       def cleanup(dir)
