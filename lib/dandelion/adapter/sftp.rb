@@ -82,25 +82,25 @@ module Dandelion
       def cleanup(dir)
         unless cleanpath(dir) == cleanpath(@config['path']) or dir == File.dirname(dir)
           if empty?(dir)
-            sftp.rmdir!(dir)
+            @sftp.rmdir!(dir)
             cleanup(File.dirname(dir))
           end
         end
       end
       
       def empty?(dir)
-        sftp.dir.entries(dir).delete_if do |file|
+        @sftp.dir.entries(dir).delete_if do |file|
           file.name == '.' or file.name == '..'
         end.empty?
       end
 
       def mkdir_p(dir)
         begin
-          sftp.mkdir!(dir)
+          @sftp.mkdir!(dir)
         rescue Net::SFTP::StatusException => e
           raise unless e.code == 2
           mkdir_p(File.dirname(dir))
-          sftp.mkdir!(dir)
+          @sftp.mkdir!(dir)
         end
       end
       
