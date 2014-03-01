@@ -10,14 +10,7 @@ module Dandelion
         if exclude?(change.path)
           log.debug("Skipping file: #{change.path}")
         else
-          case change.type
-          when :write
-            log.debug("Writing file:  #{change.path}")
-            @adapter.write(change.path, change.data)
-          when :delete
-            log.debug("Deleting file: #{change.path}")  
-            @adapter.delete(change.path)
-          end
+          deploy_change!(change)
         end
       end
     end
@@ -36,6 +29,17 @@ module Dandelion
     end
 
   private
+
+    def deploy_change!(change)
+      case change.type
+      when :write
+        log.debug("Writing file:  #{change.path}")
+        @adapter.write(change.path, change.data)
+      when :delete
+        log.debug("Deleting file: #{change.path}")  
+        @adapter.delete(change.path)
+      end
+    end
 
     def exclude?(path)
       excluded = @options[:exclude] || []

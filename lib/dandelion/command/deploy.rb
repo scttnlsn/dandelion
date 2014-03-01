@@ -27,20 +27,8 @@ module Dandelion
         log.info("Remote revision:    #{remote_commit ? remote_commit.oid : '---'}")
         log.info("Deploying revision: #{local_commit.oid}")
 
-        changeset = workspace.changeset
-
-        if changeset.empty?
-          log.info("No changes to deploy")
-        else
-          log.info("Deploying changes...")
-          deployer.deploy_changeset!(workspace.changeset)
-          workspace.remote_commit = workspace.local_commit unless options[:dry]
-        end
-
-        if config[:additional] && config[:additional].length > 0
-          log.info("Deploying additional files...")
-          deployer.deploy_files!(config[:additional])
-        end
+        deploy_changeset!
+        deploy_additional_files!        
       end
 
       def deployer_adapter
@@ -52,7 +40,28 @@ module Dandelion
       end
 
       def deployer
-        Deployer.new(deployer_adapter, config)
+        @deployer ||= Deployer.new(deployer_adapter, config)
+      end
+
+    private
+
+      def deploy_changeset!
+        changeset = workspace.changeset
+
+        if changeset.empty?
+          log.info("No changes to deploy")
+        else
+          log.info("Deploying changes...")
+          deployer.deploy_changeset!(workspace.changeset)
+          workspace.remote_commit = workspace.local_commit unless options[:dry]
+        end
+      end
+
+      def deploy_additional_files!
+        if config[:additional] && config[:additional].length > 0
+          log.info("Deploying additional files...")
+          deployer.deploy_files!(config[:additional])
+        end
       end
     end
   end

@@ -20,7 +20,7 @@ module Dandelion
       log.fatal("Unsupported adapter: #{config[:adapter]}")
       exit 1
     rescue Adapter::MissingDependencyError => e
-      log.fatal("The #{command.config[:adapter]} adapter requires additional gems:")
+      log.fatal("The #{config[:adapter]} adapter requires additional gems:")
       log.fatal(e.gems.map { |name| "    #{name}"}.join("\n"))
       log.fatal("Please install the gems first: gem install #{e.gems.join(' ')}")
       exit 1
