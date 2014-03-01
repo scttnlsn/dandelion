@@ -14,15 +14,6 @@ module Dandelion
         end
       end
 
-      def deployer
-        if options[:dry]
-          noop_adapter = Adapter::NoOpAdapter.new(config)
-          Deployer.new(repo, noop_adapter, config)
-        else
-          Deployer.new(repo, adapter, config)
-        end
-      end
-
       def setup(args)
         config[:revision] = args.shift || nil
       end
@@ -30,14 +21,32 @@ module Dandelion
       def execute!
         log.info("Connecting to #{adapter.to_s}")
 
-        diff = workspace.diff
+        local_commit = workspace.local_commit
+        remote_commit = workspace.remote_commit
+        
+        log.info("Remote revision:    #{remote_commit ? remote_commit.oid : '---'}")
+        log.info("Deploying revision: #{local_commit.oid}")
 
-        if diff.empty?
+        changeset = workspace.changeset
+
+        if changeset.empty?
           log.info("No changes to deploy")
         else
-          deployer.deploy!(workspace.diff)
+          deployer.deploy!(workspace.changeset)
           workspace.remote_commit = workspace.local_commit unless options[:dry]
         end
+      end
+
+      def deployer_adapter
+        if options[:dry]
+          Adapter::NoOpAdapter.new(config)
+        else
+          adapter
+        end
+      end
+
+      def deployer
+        Deployer.new(deployer_adapter, config)
       end
     end
   end

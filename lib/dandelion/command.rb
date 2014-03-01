@@ -1,8 +1,9 @@
 require 'optparse'
-require 'yaml'
 
 module Dandelion
   module Command
+    class InvalidCommandError < StandardError; end
+
     class Base
       class << self
         @@commands = {}
@@ -16,6 +17,7 @@ module Dandelion
         end
 
         def lookup(name)
+          raise InvalidCommandError.new(name) unless @@commands[name]
           @@commands[name]
         end
 
@@ -46,34 +48,19 @@ module Dandelion
         end
       end
 
-      attr_reader :options
+      attr_reader :workspace, :config, :options
 
-      def initialize(options = {})
+      def initialize(workspace, config, options = {})
+        @workspace = workspace
+        @config = config
         @options = options
       end
 
       def setup(args)
       end
 
-      def config
-        return @config if @config
-
-        @config = {}
-        data = YAML.load_file(@options[:config]) || {}
-        data.each_pair { |k, v| @config[k.to_sym] = v }
-        @config
-      end
-
-      def repo
-        @repo ||= Rugged::Repository.new(@options[:repo])
-      end
-
       def adapter
-        @adapter ||= Adapter::Base.create_adapter(config[:adapter], config)
-      end
-
-      def workspace
-        @workspace ||= Workspace.new(repo, adapter, config)
+        workspace.adapter
       end
 
       def log

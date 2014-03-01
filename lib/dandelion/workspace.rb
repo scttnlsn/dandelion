@@ -1,13 +1,25 @@
 module Dandelion
+  class RevisionError < StandardError; end
+
   class Workspace
-    def initialize(repo, adapter, options = {})
+    attr_reader :adapter
+    
+    def initialize(repo, adapter, config = {})
       @repo = repo
       @adapter = adapter
-      @options = options.merge(default_options)
+      @config = config.merge(default_options)
+    end
+
+    def tree
+      Tree.new(@repo, local_commit)
+    end
+
+    def changeset
+      Changeset.new(tree, remote_commit)
     end
 
     def local_commit
-      lookup(revision)
+      lookup(local_sha)
     end
 
     def remote_commit
@@ -19,34 +31,38 @@ module Dandelion
       self.remote_sha = commit.oid
     end
 
-    def diff
-      Diff.new(remote_commit, local_commit, local_path: @options[:local_path])
-    end
-
   private
 
     def default_options
       { revision_file: '.revision', local_path: '' }
     end
 
-    def revision
-      @options[:revision] || @repo.head.target
-    end
-
     def lookup(val)
       begin
+        begin
+          if ref = @repo.ref(val)
+            val = ref.target.to_s
+          end
+        rescue Rugged::ReferenceError
+        end
+
         @repo.lookup(val)
-      rescue Rugged::OdbError
-        nil
+      rescue Rugged::OdbError, Rugged::InvalidError
+        raise RevisionError.new(val)
       end
     end
 
+    def local_sha
+      @config[:revision] || @repo.head.target
+    end
+
     def remote_sha
-      @adapter.read(@options[:revision_file])
+      @remote_sha ||= @adapter.read(@config[:revision_file])
     end
 
     def remote_sha=(sha)
-      @adapter.write(@options[:revision_file], sha)
+      @adapter.write(@config[:revision_file], sha)
+      @remote_sha = sha
     end
   end
 end

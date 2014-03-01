@@ -1,5 +1,7 @@
 module Dandelion
   module Adapter
+    class InvalidAdapterError < StandardError; end
+
     class MissingDependencyError < StandardError
       attr_reader :gems
 
@@ -18,13 +20,10 @@ module Dandelion
 
         def create_adapter(name, options = {})
           klass = @@adapters[name]
-          return nil if klass.nil?
-
-          begin
-            klass.new(options)
-          rescue LoadError
-            raise MissingDependencyError.new(klass.required_gems)
-          end
+          raise InvalidAdapterError if klass.nil?
+          klass.new(options)
+        rescue LoadError
+          raise MissingDependencyError.new(klass.required_gems)
         end
 
         attr_reader :required_gems
@@ -34,7 +33,7 @@ module Dandelion
         end
       end
 
-      def initialize(config)
+      def initialize(options)
       end
     end
   end

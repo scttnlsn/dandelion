@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe Dandelion::Command::Base do
+  let(:workspace) { double('workspace', adapter: double('adapter')) }
+  let(:config) { double('config') }
+  let(:options) { double('options') }
+
+  let(:command) { Dandelion::Command::Base.new(workspace, config, options) }
+
   it 'registers command classes' do
     class TestCommand < Dandelion::Command::Base
       command :test
@@ -9,53 +15,27 @@ describe Dandelion::Command::Base do
     expect(Dandelion::Command::Base.lookup(:test)).to eq TestCommand
   end
 
-  describe '#config' do
-    let(:command) { Dandelion::Command::Base.new(config: 'foo') }
-
-    it 'parses yaml config file' do
-      config = {}
-      YAML.should_receive(:load_file).with('foo').and_return(config)
-      expect(command.config).to eq config
-    end
+  it 'raises error on invalid command' do
+    expect {
+      Dandelion::Command::Base.lookup(:another)
+    }.to raise_error(Dandelion::Command::InvalidCommandError)
   end
 
-  describe '#repo' do
-    let(:command) { Dandelion::Command::Base.new(repo: 'foo') }
+  it 'has workspace' do
+    expect(command.workspace).to eq workspace
+  end
 
-    it 'creates repository object' do
-      repo = double()
-      Rugged::Repository.should_receive(:new).with('foo').and_return(repo)
-      expect(command.repo).to eq repo
-    end
+  it 'has config' do
+    expect(command.config).to eq config
+  end
+
+  it 'has options' do
+    expect(command.options).to eq options
   end
 
   describe '#adapter' do
-    let(:command) { Dandelion::Command::Base.new }
-
-    it 'creates adapter object from config' do
-      command.stub(:config).and_return(adapter: 'foo')
-
-      adapter = double();
-      Dandelion::Adapter::Base.should_receive(:create_adapter).with('foo', command.config).and_return(adapter)
-      expect(command.adapter).to eq adapter
-    end
-  end
-
-  describe '#workspace' do
-    let(:repo) { double() }
-    let(:adapter) { double() }
-    let(:config) { double() }
-
-    let(:command) { Dandelion::Command::Base.new }
-
-    it 'creates workspace from repo and adapter' do
-      command.stub(:repo).and_return(repo)
-      command.stub(:adapter).and_return(adapter)
-      command.stub(:config).and_return(config)
-
-      workspace = double()
-      Dandelion::Workspace.should_receive(:new).with(repo, adapter, config).and_return(workspace)
-      expect(command.workspace).to eq workspace
+    it 'returns workspace adapter' do
+      expect(command.adapter).to eq workspace.adapter
     end
   end
 

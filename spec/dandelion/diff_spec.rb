@@ -5,32 +5,34 @@ describe Dandelion::Diff do
   let(:to_commit) { test_repo.lookup('3d9b743acb4a84dd99002d2c6f3fcf1a47e9f06b') }
 
   context 'non-nil from commit' do
-    let(:diff) { Dandelion::Diff.new(from_commit, to_commit) }
+    let(:diff) { test_diff }
 
     describe '#empty?' do
-      it 'returns true if there are no changes or deletes' do
+      it 'returns true if there are no changes' do
         expect(diff.empty?).to_not be
       end
     end
 
-    describe '#changed' do
-      it 'returns paths that have changed between commits' do
-        expect(diff.changed).to include 'foo'
-        expect(diff.changed).to include 'qux'
-        expect(diff.changed).to include 'baz/bar'
-        expect(diff.changed.length).to eq 3
-      end
-    end
-
-    describe '#deleted' do
-      it 'returns paths that have been deleted between commits' do
-        expect(diff.deleted).to include 'bar'
-        expect(diff.deleted).to include 'baz/foo'
-        expect(diff.deleted.length).to eq 2
+    describe '#enumerable' do
+      it 'returns all changes between commits' do
+        expect(diff.to_a.length).to eq 5
       end
 
-      it 'does not include paths that were added and deleted' do
-        expect(diff.deleted).to_not include 'baz/qux'
+      it 'returns write paths' do
+        changes = diff.select { |c| c.type == :write }.map(&:path)
+
+        expect(changes).to include 'foo'
+        expect(changes).to include 'qux'
+        expect(changes).to include 'baz/bar'
+        expect(changes.length).to eq 3
+      end
+
+      it 'returns delete paths' do
+        changes = diff.select { |c| c.type == :delete }.map(&:path)
+
+        expect(changes).to include 'bar'
+        expect(changes).to include 'baz/foo'
+        expect(changes.length).to eq 2
       end
     end
   end
@@ -38,23 +40,14 @@ describe Dandelion::Diff do
   context 'nil from commit' do
     let(:diff) { Dandelion::Diff.new(nil, to_commit) }
 
-    describe '#changed' do
+    describe '#enumerable' do
       it 'returns all paths in to commit' do
-        expect(diff.changed).to include 'foo'
-        expect(diff.changed).to include 'qux'
-        expect(diff.changed).to include 'baz/bar'
-        expect(diff.changed.length).to eq 3
-      end
-    end
-  end
+        changes = diff.map(&:path)
 
-  context 'local path' do
-    let(:diff) { Dandelion::Diff.new(from_commit, to_commit, local_path: 'baz') }
-
-    describe '#changed' do
-      it 'returns relative paths that have changed between commits' do
-        expect(diff.changed).to include 'bar'
-        expect(diff.changed.length).to eq 1
+        expect(changes).to include 'foo'
+        expect(changes).to include 'qux'
+        expect(changes).to include 'baz/bar'
+        expect(changes.length).to eq 3
       end
     end
   end

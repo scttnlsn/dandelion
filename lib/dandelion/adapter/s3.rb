@@ -38,9 +38,9 @@ module Dandelion
       
       def s3connect!
         options = {
-          :access_key_id => @access_key_id,
-          :secret_access_key => @secret_access_key,
-          :use_ssl => true
+          access_key_id: @access_key_id,
+          secret_access_key: @secret_access_key,
+          use_ssl: true
         }
 
         options[:server] = @host if @host

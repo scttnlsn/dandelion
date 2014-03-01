@@ -2,51 +2,23 @@ require 'forwardable'
 
 module Dandelion
   class Diff
-    extend ::Forwardable
+    extend Forwardable
+    include Enumerable
 
     def_delegator :@target, :empty?
+    def_delegator :@target, :each
 
-    attr_reader :from, :to
+    attr_reader :from_commit, :to_commit
 
-    def initialize(from_commit, to_commit, options = {})
-      @from = from_commit
-      @to = to_commit
-      @options = options
+    def initialize(from_commit, to_commit)
+      @from_commit = from_commit
+      @to_commit = to_commit
 
       if from_commit.nil?
         @target = FullDiff.new(to_commit.diff(nil))
       else
         @target = PartialDiff.new(from_commit.diff(to_commit))
       end
-    end
-
-    def changed
-      transformed_paths(@target.changed)
-    end
-
-    def deleted
-      transformed_paths(@target.deleted)
-    end
-
-  private
-
-    def transformed_paths(paths)
-      paths.select(&method(:applicable?)).map(&method(:trim_path))
-    end
-
-    def local_path
-      @options[:local_path] || ''
-    end
-
-    def applicable?(path)
-      path.start_with?(local_path)
-    end
-
-    def trim_path(path)
-      return path unless applicable?(path)
-      trimmed = path[local_path.length..-1]
-      trimmed = trimmed[1..-1] if trimmed[0] == File::SEPARATOR
-      trimmed
     end
   end
 
@@ -61,12 +33,14 @@ private
       @deltas.empty?
     end
 
-    def changed
-      @deltas.select { |d| !d.deleted? }.map { |d| d.new_file[:path] }
-    end
-
-    def deleted
-      @deltas.select { |d| d.deleted? }.map { |d| d.old_file[:path] }
+    def each
+      @deltas.each do |delta|
+        if delta.deleted?
+          yield Change.new(delta.old_file[:path], :delete)
+        else
+          yield Change.new(delta.new_file[:path], :write)
+        end
+      end
     end
   end
 
@@ -79,12 +53,10 @@ private
       @deltas.empty?
     end
 
-    def changed
-      @deltas.map { |delta| delta.new_file[:path] }
-    end
-
-    def deleted
-      []
+    def each
+      @deltas.each do |delta|
+        yield Change.new(delta.new_file[:path], :write)
+      end
     end
   end
 end

@@ -1,6 +1,13 @@
 require 'spec_helper'
 
 describe Dandelion::Command::Deploy do
+  let(:config) {{}}
+  let(:options) {{}}
+
+  let(:adapter) { double('adapter') }
+  let(:workspace) { Dandelion::Workspace.new(test_repo, adapter) }
+  let(:command) { Dandelion::Command::Deploy.new(workspace, config, options) }
+
   describe '#parser' do
     let(:options) { {} }
     let(:parser) { Dandelion::Command::Deploy.parser(options) }
@@ -12,62 +19,77 @@ describe Dandelion::Command::Deploy do
     end
   end
 
-  describe '#deployer' do
-    let(:repo) { double() }
-    let(:adapter) { double() }
-    let(:config) { double() }
-
-    let(:command) { Dandelion::Command::Deploy.new }
-
-    it 'creates deployer for repo, adapter and config' do
-      command.stub(:repo).and_return(repo)
-      command.stub(:adapter).and_return(adapter)
-      command.stub(:config).and_return(config)
-
-      deployer = double()
-      Dandelion::Deployer.should_receive(:new).with(repo, adapter, config).and_return(deployer)
-      expect(command.deployer).to eq deployer
+  describe '#deployer_adapter' do
+    it 'returns workspace adapter' do
+      adapter = double('adapter')
+      workspace.should_receive(:adapter).and_return(adapter)
+      expect(command.deployer_adapter).to eq adapter
     end
 
     context 'dry run' do
-      it 'uses noop adapter' do
-        command.stub(:options).and_return(dry: true)
-        command.stub(:repo).and_return(repo)
-        command.stub(:config).and_return(config)
+      before(:each) { options[:dry] = true }
 
-        deployer = double()
-        noop_adapter = double()
-        Dandelion::Adapter::NoOpAdapter.should_receive(:new).and_return(noop_adapter)
-        Dandelion::Deployer.should_receive(:new).with(repo, noop_adapter, config).and_return(deployer)
-        expect(command.deployer).to eq deployer
+      it 'uses no-op adapter' do
+        noop = double('no-op adapter')
+        Dandelion::Adapter::NoOpAdapter.should_receive(:new).with(command.config).and_return(noop)
+        expect(command.deployer_adapter).to eq noop
       end
     end
   end
 
-  describe '#execute!' do
-    let(:deployer) { double() }
-    let(:diff) { double() }
-    let(:workspace) { double() }
-    let(:adapter) { double() }
-    let(:local_commit) { double() }
+  describe '#deployer' do
+    before(:each) { command.stub(:adapter).and_return(double('adapter')) }
 
-    let(:command) { Dandelion::Command::Deploy.new }
+    it 'creates deployer for adapter, and config' do
+      deployer = double('deployer')
+      Dandelion::Deployer.should_receive(:new).with(command.deployer_adapter, command.config).and_return(deployer)
+      expect(command.deployer).to eq deployer
+    end
+  end
+
+  describe '#setup' do
+    it 'sets revision' do
+      command.setup([:foo])
+      expect(command.config[:revision]).to eq :foo
+    end
+  end
+
+  describe '#execute!' do
+    let(:adapter) { Dandelion::Adapter::NoOpAdapter.new(config) }
+    let(:workspace) { Dandelion::Workspace.new(test_repo, adapter) }
+    let(:command) { Dandelion::Command::Deploy.new(workspace, config, options) }
+
+    let(:deployer) { double('deployer') }
+    let(:changeset) { double('changeset') }
 
     before(:each) do
-      diff.stub(:empty?).and_return(false)
-      
-      workspace.stub(:diff).and_return(diff)
-      workspace.stub(:local_commit).and_return(local_commit)
-
-      command.stub(:adapter).and_return(adapter)
+      workspace.stub(:changeset).and_return(changeset)
       command.stub(:deployer).and_return(deployer)
-      command.stub(:workspace).and_return(workspace)
     end
 
-    it 'deploys workspace diff and sets remote commit' do
-      deployer.should_receive(:deploy!).with(diff)
-      workspace.should_receive(:remote_commit=).with(workspace.local_commit)
-      command.execute!
+    context 'empty changeset' do
+      before(:each) { changeset.stub(:empty?).and_return(true) }
+
+      it 'does nothing' do
+        deployer.should_not_receive(:deploy!)
+      end
+    end
+
+    context 'non-empty changeset' do
+      before(:each) do
+        deployer.stub(:deploy!)
+        changeset.stub(:empty?).and_return(false)
+      end
+
+      it 'deploys changeset' do
+        deployer.should_receive(:deploy!).with(changeset)
+        command.execute!
+      end
+
+      it 'sets remote revision to local revision' do
+        workspace.should_receive(:remote_commit=).with(workspace.local_commit)
+        command.execute!
+      end
     end
   end
 end

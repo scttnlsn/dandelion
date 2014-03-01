@@ -8,9 +8,42 @@ module Dandelion
       @parser = Command::Base.parser(@options)
     end
 
+    def config
+      @config ||= Config.new(config_path).tap do |config|
+        config[:adapter] ||= config[:scheme] # backward compat
+      end
+    end
+
+    def adapter
+      @adapter ||= Adapter::Base.create_adapter(config[:adapter], config)
+    rescue Adapter::InvalidAdapterError => e
+      log.fatal("Unsupported adapter: #{config[:adapter]}")
+      exit 1
+    rescue Adapter::MissingDependencyError => e
+      log.fatal("The #{command.config[:adapter]} adapter requires additional gems:")
+      log.fatal(e.gems.map { |name| "    #{name}"}.join("\n"))
+      log.fatal("Please install the gems first: gem install #{e.gems.join(' ')}")
+      exit 1
+    end
+
+    def repo
+      @repo ||= Rugged::Repository.new(repo_path)
+    end
+
+    def workspace
+      @workspace ||= Workspace.new(repo, adapter, config)
+    end
+
+    def command_class
+      @command_class ||= Command::Base.lookup(@args.shift.to_sym)
+    rescue Command::InvalidCommandError => e
+      log.fatal("Invalid command: #{e}")
+      display_help
+      exit 1
+    end
+
     def execute!
-      parse(@parser)
-      prepare
+      parse!(@parser)
 
       if @options[:help]
         display_help
@@ -22,63 +55,48 @@ module Dandelion
         exit
       end
 
-      validate
+      validate!
 
-      command_name = @args.shift.to_sym
-      command_class = Command::Base.lookup(command_name)
+      parse!(command_class.parser(@options))
 
-      if command_class.nil?
-        log.fatal("Invalid command: #{command_name}")
-        display_help
-        exit 1
-      end
-
-      parse(command_class.parser(@options))
-
-      command = command_class.new(@options)
-      command.config[:adapter] ||= command.config[:scheme] # backward compat
+      command = command_class.new(workspace, config, @options)
+      command.setup(@args)
 
       begin
-        unless command.adapter
-          log.fatal("Unsupported adapter: #{command.config[:adapter]}")
-          exit 1
-        end
-      rescue Adapter::MissingDependencyError => e
-        log.fatal("The #{command.config[:adapter]} adapter requires additional gems:")
-        log.fatal(e.gems.map { |name| "    #{name}"}.join("\n"))
-        log.fatal("Please install the gems first: gem install #{e.gems.join(' ')}")
+        command.execute!
+      rescue RevisionError => e
+        log.fatal("Invalid revision: #{e}")
         exit 1
       end
-
-      command.setup(@args)
-      command.execute!
     end
 
   private
 
-    def prepare
+    def config_path
+      @options[:config] || File.join(repo_path, 'dandelion.yml')
+    end
+
+    def repo_path
       if @options[:repo]
-        @options[:repo] = File.expand_path(@options[:repo])
+        File.expand_path(@options[:repo])
       else
-        @options[:repo] = closest_repo(File.expand_path('.'))
-      end
-
-      @options[:config] ||= File.join(@options[:repo], 'dandelion.yml')
-    end
-
-    def validate
-      unless File.exists?(File.join(@options[:repo], '.git'))
-        log.fatal("Not a git repository: #{@options[:repo]}")
-        exit 1
-      end
-
-      unless File.exists?(@options[:config])
-        log.fatal("Missing config file: #{@options[:config]}")
-        exit 1
+        closest_repo(File.expand_path('.'))
       end
     end
 
-    def parse(parser)
+    def validate!
+      unless File.exists?(File.join(repo_path, '.git'))
+        log.fatal("Not a git repository: #{repo_path}")
+        exit 1
+      end
+
+      unless File.exists?(config_path)
+        log.fatal("Missing config file: #{config_path}")
+        exit 1
+      end
+    end
+
+    def parse!(parser)
       begin
         parser.order!(@args)
       rescue OptionParser::InvalidOption => e

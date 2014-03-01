@@ -1,11 +1,15 @@
 require 'spec_helper'
 
 describe Dandelion::Workspace do
-  let!(:adapter) { double('adapter') }
-  let!(:workspace) { Dandelion::Workspace.new(test_repo, adapter) }
+  let(:adapter) { double('adapter') }
+  let(:workspace) { Dandelion::Workspace.new(test_repo, adapter) }
 
-  let!(:head_revision) { '3d9b743acb4a84dd99002d2c6f3fcf1a47e9f06b' }
-  let!(:initial_revision) { 'e289ff1e2729839759dbd6fe99b6e35880910c7c' }
+  let(:head_revision) { '3d9b743acb4a84dd99002d2c6f3fcf1a47e9f06b' }
+  let(:initial_revision) { 'e289ff1e2729839759dbd6fe99b6e35880910c7c' }
+
+  it 'has an adapter' do
+    expect(workspace.adapter).to eq adapter
+  end
 
   describe '#local_commit' do
     context 'no revision specified' do
@@ -15,7 +19,7 @@ describe Dandelion::Workspace do
     end
 
     context 'valid revision specified' do
-      let!(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: initial_revision) }
+      let(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: initial_revision) }
 
       it 'returns commit for given revision' do
         expect(workspace.local_commit.oid).to eq initial_revision
@@ -23,10 +27,10 @@ describe Dandelion::Workspace do
     end
 
     context 'invalid revision specified' do
-      let!(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: 'abcdef' ) }
+      let(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: 'abcdef' ) }
 
-      it 'returns nil' do
-        expect(workspace.local_commit).to eq nil
+      it 'raises revision error' do
+        expect { workspace.local_commit }.to raise_error(Dandelion::RevisionError)
       end
     end
   end
@@ -48,23 +52,26 @@ describe Dandelion::Workspace do
     end
   end
 
-  describe '#diff' do
-    before(:each) do
-      adapter.stub(:read).with('.revision').and_return(initial_revision)
+  describe '#tree' do
+    it 'returns tree for repo and local commit' do
+      tree = double()
+      Dandelion::Tree.should_receive(:new).with(test_repo, workspace.local_commit).and_return(tree)
+      expect(workspace.tree).to eq tree
     end
+  end
 
-    context 'with no changes' do
-      let!(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: initial_revision) }
+  describe '#changeset' do
+    it 'returns changeset for tree and remote commit' do
+      changeset = double('changeset')
+      tree = double('tree')
+      remote_commit = double('remote_commit')
 
-      it 'returns empty diff' do
-        expect(workspace.diff.empty?).to be
-      end
-    end
+      workspace.stub(:tree).and_return(tree)
+      workspace.stub(:remote_commit).and_return(remote_commit)
 
-    context 'with changes' do
-      it 'returns non-empty diff' do
-        expect(workspace.diff.empty?).to_not be
-      end
+      Dandelion::Changeset.should_receive(:new).with(tree, remote_commit).and_return(changeset)
+
+      expect(workspace.changeset).to eq changeset
     end
   end
 end
