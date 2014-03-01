@@ -4,7 +4,7 @@ Dandelion
 [![Dependency Status](https://gemnasium.com/scttnlsn/dandelion.png)](https://gemnasium.com/scttnlsn/dandelion)
 [![Code Climate](https://codeclimate.com/github/scttnlsn/dandelion.png)](https://codeclimate.com/github/scttnlsn/dandelion)
 
-Incremental Git repository deployment for OS X and Linux.
+Incremental Git repository deployment.
 
 Install
 -------
@@ -12,12 +12,6 @@ Install
 Ensure that Ruby is installed, then run:
 
     $ gem install dandelion
-
-Alternatively, you can build the gem yourself:
-
-    $ git clone git://github.com/scttnlsn/dandelion.git
-    $ cd dandelion
-    $ rake install
 
 Config
 ------
@@ -28,7 +22,7 @@ Git repository is searched for a file named `dandelion.yml`).
 Example:
 
 ```yaml
-scheme: sftp
+adapter: sftp
 host: example.com
 username: user
 password: pass
@@ -40,14 +34,12 @@ exclude:
     - folder/
 
 additional:
-    - public/css/print.css
-    - public/css/screen.css
-    - public/js/main.js
+    - config/auth.yml
 ```
 
 Required:
 
- * `scheme` (the file transfer scheme, see below)
+ * `adapter` (alias: `scheme`, the file transfer adapter)
 
 Optional:
 
@@ -57,16 +49,16 @@ Optional:
 * `additional` (additional list of files from your working directory that will be deployed)
 * `revision_file` (remote file in which revision SHA is stored, defaults to .revision)
 
-Each scheme also has additional required and optional configuration parameters (see below).
+Each adapter also has additional required and optional configuration parameters (see below).
 
-Schemes
--------
+Adapters
+--------
 
-There is support for multiple backend file transfer schemes.  The configuration
-must specify one of these schemes and the set of additional parameters required
-by the given scheme.
+There is support for multiple backend file transfer adapters.  The configuration
+must specify one of these adapters and the set of additional parameters required
+by the given adapter.
 
-**SFTP**: `scheme: sftp`
+**SFTP**: `adapter: sftp`
 
 Required:
 
@@ -79,7 +71,7 @@ Optional:
  * `port` (defaults to 22)
  * `preserve_permissions` (defaults to true)
 
-**FTP**: `scheme: ftp`
+**FTP**: `adapter: ftp`
 
 Required:
 
@@ -92,7 +84,7 @@ Optional:
  * `port` (defaults to 21)
  * `passive` (defaults to true)
 
-**Amazon S3**: `scheme: s3`
+**Amazon S3**: `adapter: s3`
 
 Required:
 
