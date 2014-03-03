@@ -35,6 +35,8 @@ describe Dandelion::Deployer do
     before(:each) do
       IO.stub(:read).with('a.txt').and_return('A')
       IO.stub(:read).with('b.txt').and_return('B')
+      IO.stub(:read).with('c/a.txt').and_return('cA')
+      IO.stub(:read).with('c/b.txt').and_return('cB')
     end
 
     context 'local paths' do
@@ -57,6 +59,26 @@ describe Dandelion::Deployer do
       it 'performs writes on adapter' do
         adapter.should_receive(:write).with('files/a.txt', 'A')
         adapter.should_receive(:write).with('files/b.txt', 'B')
+
+        deployer.deploy_files!(files)
+      end
+    end
+
+    context 'directory' do
+      let(:files) {[
+        { 'c/' => 'C/' }
+      ]}
+
+      before(:each) do
+        File.stub(:directory?).with('c/').and_return(true)
+        File.stub(:directory?).with('c/a.txt').and_return(false)
+        File.stub(:directory?).with('c/b.txt').and_return(false)
+        Dir.stub(:glob).with('c/**/*').and_return(['c/a.txt', 'c/b.txt'])
+      end
+
+      it 'performs writes on adapter' do
+        adapter.should_receive(:write).with('C/a.txt', 'cA')
+        adapter.should_receive(:write).with('C/b.txt', 'cB')
 
         deployer.deploy_files!(files)
       end

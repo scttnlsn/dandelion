@@ -23,12 +23,24 @@ module Dandelion
           local_path, remote_path = path.first
         end
 
-        log.debug("Writing file:  #{local_path} -> #{remote_path}")
-        @adapter.write(remote_path, IO.read(local_path))
+        if File.directory?(local_path)
+          paths = expand_paths(local_path, remote_path)
+        else
+          paths = [[local_path, remote_path]]
+        end
+
+        paths.each do |local_path, remote_path|
+          deploy_file!(local_path, remote_path)
+        end
       end
     end
 
   private
+
+    def deploy_file!(local_path, remote_path)
+      log.debug("Writing file:  #{local_path} -> #{remote_path}")
+      @adapter.write(remote_path, IO.read(local_path))
+    end
 
     def deploy_change!(change)
       case change.type
@@ -44,6 +56,21 @@ module Dandelion
     def exclude?(path)
       excluded = @options[:exclude] || []
       excluded.map { |e| path.start_with?(e) }.any?
+    end
+
+    def expand_paths(dir, remote_path)
+      paths = Dir.glob(File.join(dir, '**/*')).map do |path|
+        trimmed = trim_path(dir, path)
+        [path, File.join(remote_path, trimmed)]
+      end
+
+      paths.reject do |local_path, remote_path|
+        File.directory?(local_path)
+      end
+    end
+
+    def trim_path(dir, path)
+      path[dir.length..-1]
     end
 
     def log
