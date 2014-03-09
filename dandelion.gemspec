@@ -1,26 +1,29 @@
-$:.push File.expand_path("../lib", __FILE__)
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'dandelion/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'dandelion'
-  s.version     = Dandelion::VERSION
-  s.platform    = Gem::Platform::RUBY
-  s.authors     = ['Scott Nelson']
-  s.email       = ['scottbnel@gmail.com']
-  s.homepage    = 'http://github.com/scttnlsn/dandelion'
-  s.summary     = "dandelion-#{s.version}"
-  s.description = 'Incremental Git repository deployment'
-  s.license     = 'MIT'
-  
-  s.add_dependency 'grit', '>= 2.4.1'
-  
-  s.add_development_dependency 'mocha', '>= 0.9.12'
-  s.add_development_dependency 'net-sftp', '>= 2.0.5'
-  s.add_development_dependency 'aws-s3', '>= 0.6.0'
+  s.name             = 'dandelion'
+  s.version          = Dandelion::VERSION
+  s.authors          = ['Scott Nelson']
+  s.email            = ['scott@scttnlsn.com']
+  s.summary          = 'Incremental Git repository deployment'
+  s.homepage         = 'https://github.com/scttnlsn/dandelion'
+  s.license          = 'MIT'
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = `git ls-files`.split($/)
+  s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ['lib']
+
+  s.post_install_message = <<-MSG
+!   The 'dandelion' gem is installed but you may need to install additional
+!   gems depending on the adapters you intend to use.
+!
+!   Running 'dandelion status' in your project directory will indicate which
+!   additional gems need to be installed.
+  MSG
+
+  s.add_dependency 'rugged', '~> 0.19.0'
 end

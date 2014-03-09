@@ -1,18 +1,34 @@
+require 'logger'
+require 'rugged'
+require 'dandelion/adapter'
+require 'dandelion/cli'
+require 'dandelion/change'
+require 'dandelion/changeset'
+require 'dandelion/command'
+require 'dandelion/config'
+require 'dandelion/diff'
+require 'dandelion/deployer'
+require 'dandelion/tree'
+require 'dandelion/version'
+require 'dandelion/workspace'
+
 module Dandelion
   class << self
     def logger
-      return @log if @log
+      return @logger if @logger
+
       $stdout.sync = true
-      @log = Logger.new($stdout)
-      @log.level = Logger::DEBUG
-      @log.formatter = formatter
-      @log
+
+      @logger = Logger.new($stdout)
+      @logger.level = Logger::DEBUG
+      @logger.formatter = formatter
+      @logger
     end
-    
-    private
-    
+
+  private
+
     def formatter
-      proc do |severity, datetime, progname, msg| 
+      proc do |severity, datetime, progname, msg|
         "#{msg}\n"
       end
     end

@@ -1,10 +1,4 @@
-require 'dandelion'
-require 'dandelion/backend'
-require 'dandelion/deployment'
-require 'dandelion/git'
-require 'dandelion/version'
 require 'optparse'
-require 'yaml'
 
 module Dandelion
   module Command
@@ -18,123 +12,75 @@ module Dandelion
           @@commands[name] = self
         end
 
-        def create(name)
-          require_commands
-          raise InvalidCommandError unless @@commands.include?(name)
-          @@commands[name]
-        end
-
         def commands
           @@commands.keys
         end
 
-        def require_commands
-          Dir.glob(File.join(File.dirname(__FILE__), 'command', '*.rb')) { |file| require file }
+        def lookup(name)
+          raise InvalidCommandError.new(name) unless @@commands[name]
+          @@commands[name]
         end
 
         def parser(options)
           OptionParser.new do |opts|
             opts.banner = 'Usage: dandelion [options] <command> [<args>]'
 
-            opts.on('-v', '--version', 'Display the current version') do
-              puts "Dandelion #{Dandelion::VERSION}"
-              exit
+            options[:version] = false
+            opts.on('-v', '--version', 'Dispay the current version') do
+              options[:version] = true
             end
 
-            opts.on('-h', '--help', 'Display this screen') do
-              require_commands
-              puts opts
-              puts "\nAvailable commands:"
-              puts commands.map { |name| "    #{name}" }.join("\n")
-              exit
+            options[:help] = false
+            opts.on('-h', '--help', 'Display this help info') do
+              options[:help] = true
+            end
+
+            options[:repo] = nil
+            opts.on('--repo=[REPO]', 'Use the given repository') do |repo|
+              options[:repo] = repo
+            end
+
+            options[:config] = nil
+            opts.on('--config=[CONFIG]', 'Use the given config file') do |config|
+              options[:config] = config
             end
 
             opts.on('--log=[level]', 'Use the given log level (fatal, error, warn, info, debug)') do |level|
               levels = {
-                :fatal => Logger::FATAL,
-                :error => Logger::ERROR,
-                :warn => Logger::WARN,
-                :info => Logger::INFO,
-                :debug => Logger::DEBUG
+                fatal: Logger::FATAL,
+                error: Logger::ERROR,
+                warn: Logger::WARN,
+                info: Logger::INFO,
+                debug: Logger::DEBUG
               }
 
               Dandelion.logger.level = levels[level.to_sym]
             end
-
-            options[:repo] = closest_repo(File.expand_path('.'))
-            opts.on('--repo=[REPO]', 'Use the given repository') do |repo|
-              options[:repo] = File.expand_path(repo)
-            end
-
-            options[:config] = nil
-            opts.on('--config=[CONFIG]', 'Use the given configuration file') do |config|
-              options[:config] = File.expand_path(config)
-            end
-          end
-        end
-
-        private
-
-        def closest_repo(dir)
-          if File.exists?(File.join(dir, '.git'))
-            dir
-          else
-            File.dirname(dir) != dir && closest_repo(File.dirname(dir)) || File.expand_path('.')
           end
         end
       end
 
-      def initialize(options)
+      attr_reader :workspace, :config, :options
+
+      def initialize(workspace, config, options = {})
+        @workspace = workspace
+        @config = config
         @options = options
-        @config = YAML.load_file(@options[:config])
-        @repo = Git::Repo.new(@options[:repo])
-
-        yield(self) if block_given?
       end
 
-      protected
+      def setup(args)
+      end
+
+      def adapter
+        workspace.adapter
+      end
 
       def log
         Dandelion.logger
       end
-
-      def backend
-        begin
-          backend = Backend::Base.create(@config)
-          log.info("Connecting to #{backend}")
-          backend
-        rescue Backend::MissingDependencyError => e
-          log.fatal("The '#{@config['scheme']}' scheme requires additional gems:")
-          log.fatal(e.gems.map { |name| "    #{name}" }.join("\n"))
-          log.fatal("Please install the gems: gem install #{e.gems.join(' ')}")
-          exit 1
-        rescue Backend::UnsupportedSchemeError
-          log.fatal("Unsupported scheme: #{@config['scheme']}")
-          exit 1
-        end
-      end
-
-      def deployment(revision, backend = nil)
-        begin
-          backend ||= backend()
-          revision_file = @config['revision_file'].nil? ? '.revision' : @config['revision_file']
-          local_path = @config['local_path'].nil? ? '' : @config['local_path']
-          options = {
-            :dry => @options[:dry],
-            :exclude => @config['exclude'],
-            :additional => @config['additional'],
-            :revision => revision,
-            :revision_file => revision_file,
-            :local_path => local_path
-          }
-
-          Deployment::Deployment.create(@repo, backend, options)
-        rescue Git::DiffError
-          log.fatal('Error: could not generate diff')
-          log.fatal('Try merging remote changes before running dandelion again')
-          exit 1
-        end
-      end
     end
   end
 end
+
+require 'dandelion/command/deploy'
+require 'dandelion/command/status'
