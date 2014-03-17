@@ -11,8 +11,11 @@ module Dandelion
       object = @commit.tree
 
       path.split('/').each do |name|
-        return nil unless object[name]
-        object = @repo.lookup(object[name][:oid])
+        info = object[name]
+        return nil unless info
+        return nil unless info[:type]
+
+        object = @repo.lookup(info[:oid])
         return nil unless object
       end
 
