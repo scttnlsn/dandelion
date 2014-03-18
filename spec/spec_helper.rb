@@ -3,8 +3,9 @@ require 'rugged'
 
 Dandelion.logger.level = Logger::UNKNOWN
 
-def test_repo
-  path = File.join(File.dirname(__FILE__), 'fixtures', 'repo.git')
+def test_repo(name = nil)
+  name ||= 'repo'
+  path = File.join(File.dirname(__FILE__), 'fixtures', "#{name}.git")
   @repo ||= Rugged::Repository.new(path)
 end
 
@@ -15,8 +16,11 @@ def test_commits
   ]
 end
 
-def test_tree
-  Dandelion::Tree.new(test_repo, test_commits.last)
+def test_tree(options = {})
+  repo = options[:repo] || test_repo
+  commit = options[:commit] || test_commits.last
+
+  Dandelion::Tree.new(repo, commit)
 end
 
 def test_changeset(options = {})

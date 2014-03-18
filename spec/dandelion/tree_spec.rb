@@ -11,5 +11,14 @@ describe Dandelion::Tree do
     it 'returns blob content for path' do
       expect(tree.data('foo')).to eq "foo\n"
     end
+
+    context 'symlink' do
+      let(:repo) { test_repo('repo_symlink') }
+      let(:tree) { test_tree(repo: repo, commit: repo.lookup('4c19bbe7ba04230a0ae2281c1abbc48a76a66550')) }
+
+      it 'returns content of link source path' do
+        expect(tree.data('link')).to eq "bar\n"
+      end
+    end
   end
 end
