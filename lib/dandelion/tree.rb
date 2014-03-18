@@ -20,15 +20,30 @@ module Dandelion
         return nil unless object
       end
 
+      content(info, object)
+    end
+
+  private
+
+    def content(info, object)
       # https://github.com/libgit2/libgit2/blob/development/include/git2/types.h
       if info[:filemode] == 0120000
-        # Symlink
-        path = object.read_raw.data
-        data(path)
+        symlink_content(object)
       else
-        # Blob
-        object.read_raw.data
+        blob_content(object)
       end
+    end
+
+    def blob_content(object)
+      object.read_raw.data
+    end
+
+    def symlink_content(object)
+      path = object.read_raw.data
+
+      result = data(path)
+      result ||= IO.read(path) # external link
+      result
     end
   end
 end
