@@ -24,7 +24,8 @@ module Dandelion
           if change.type == :delete
             yield Change.new(path, change.type)
           else
-            yield Change.new(path, change.type, @tree.data(change.path))
+            read = -> { @tree.data(change.path) }
+            yield Change.new(path, change.type, read)
           end
         end
       end

@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Dandelion::Change do
-  let(:change) { Dandelion::Change.new('foo', 'bar', 'baz') }
+  let(:read) { -> { 'baz' }}
+  let(:change) { Dandelion::Change.new('foo', 'bar', read) }
 
   it 'has path' do
     expect(change.path).to eq 'foo'

@@ -1,11 +1,15 @@
 module Dandelion
   class Change
-    attr_reader :path, :type, :data
+    attr_reader :path, :type
     
-    def initialize(path, type, data = nil)
+    def initialize(path, type, read = nil)
       @path = path
       @type = type
-      @data = data
+      @read = read
+    end
+
+    def data
+      @read.() if @read
     end
   end
 end
