@@ -1,15 +1,25 @@
 require 'spec_helper'
 
 describe Dandelion::Config do
-  let(:data) {{ 'foo' => 'bar' }}
+  let(:yaml) do
+    <<-YAML
+      foo: bar
+      baz: <%= ENV['BAZ'] %>
+    YAML
+  end
 
   before(:each) do
-    YAML.should_receive(:load_file).with('foo').and_return(data)
+    ENV['BAZ'] = 'qux'
+    IO.should_receive(:read).with('foo').and_return(yaml)
   end
 
   let(:config) { Dandelion::Config.new(path: 'foo') }
 
-  it 'parses yaml config file' do
+  it 'parses YAML' do
     expect(config[:foo]).to eq 'bar'
+  end
+
+  it 'parses ERB' do
+    expect(config[:baz]).to eq 'qux'
   end
 end

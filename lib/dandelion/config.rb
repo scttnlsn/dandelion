@@ -1,3 +1,4 @@
+require 'erb'
 require 'yaml'
 
 module Dandelion
@@ -30,7 +31,15 @@ module Dandelion
   private
 
     def load
-      YAML.load_file(path) || {}
+      YAML.load(template.result(binding)) || {}
+    end
+
+    def content
+      IO.read(path)
+    end
+
+    def template
+      ERB.new(content)
     end
   end
 end
