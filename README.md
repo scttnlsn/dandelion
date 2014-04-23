@@ -83,7 +83,7 @@ Required:
 Optional:
 
  * `port` (defaults to 21)
- * `passive` (defaults to true)
+ * `passive` (defaults to false)
 
 **Amazon S3**: `adapter: s3`
 
