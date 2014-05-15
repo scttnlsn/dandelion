@@ -41,18 +41,28 @@ module Dandelion
   private
 
     def lookup(val)
-      begin
-        begin
-          if ref = @repo.ref(val)
-            val = ref.target.to_s
-          end
-        rescue Rugged::ReferenceError
-        end
+      result = lookup_sha(val) ||
+        lookup_ref(val) ||
+        lookup_ref("refs/tags/#{val}") ||
+        lookup_ref("refs/branches/#{val}") ||
+        lookup_ref("refs/heads/#{val}")
 
-        @repo.lookup(val)
-      rescue Rugged::OdbError, Rugged::InvalidError
-        raise RevisionError.new(val)
-      end
+      raise RevisionError.new(val) unless result
+
+      result
+    end
+
+    def lookup_sha(val)
+      @repo.lookup(val)
+    rescue Rugged::OdbError, Rugged::InvalidError
+      nil
+    end
+
+    def lookup_ref(val)
+      ref = @repo.ref(val)
+      lookup_sha(ref.target) if ref
+    rescue Rugged::ReferenceError
+      nil
     end
 
     def local_sha

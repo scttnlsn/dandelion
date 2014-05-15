@@ -19,10 +19,28 @@ describe Dandelion::Workspace do
     end
 
     context 'valid revision specified' do
-      let(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: initial_revision) }
+      context 'sha' do
+        let(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: initial_revision) }
 
-      it 'returns commit for given revision' do
-        expect(workspace.local_commit.oid).to eq initial_revision
+        it 'returns commit for given revision' do
+          expect(workspace.local_commit.oid).to eq initial_revision
+        end
+      end
+
+      context 'tag' do
+        let(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: 'test-tag') }
+
+        it 'returns commit for given revision' do
+          expect(workspace.local_commit.oid).to eq initial_revision
+        end
+      end
+
+      context 'branch' do
+        let(:workspace) { Dandelion::Workspace.new(test_repo, adapter, revision: 'master') }
+
+        it 'returns commit for given revision' do
+          expect(workspace.local_commit.oid).to eq head_revision
+        end
       end
     end
 

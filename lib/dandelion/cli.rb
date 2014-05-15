@@ -4,10 +4,11 @@ module Dandelion
   class CLI
     def initialize(args)
       @args = args
+      
       @options = {}
-      @parser = Command::Base.parser(@options)
-
       @options[:help] = true if @args.length == 0
+
+      @parser = Command::Base.parser(@options)
     end
 
     def config
