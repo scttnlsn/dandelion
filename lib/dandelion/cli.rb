@@ -6,6 +6,8 @@ module Dandelion
       @args = args
       @options = {}
       @parser = Command::Base.parser(@options)
+
+      @options[:help] = true if @args.length == 0
     end
 
     def config
