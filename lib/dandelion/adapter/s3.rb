@@ -7,49 +7,55 @@ module Dandelion
       def initialize(config)
         require 'aws/s3'
         
-        @access_key_id = config[:access_key_id]
-        @secret_access_key = config[:secret_access_key]
-        @bucket_name = config[:bucket_name]
-        @host = config[:host]
-        @path = config[:path]
+        @config = config
+        @config.defaults(preserve_permissions: true)
       end
 
       def read(file)
-        s3connect!
-        return nil unless AWS::S3::S3Object.exists?(path(file), @bucket_name)
-        AWS::S3::S3Object.value(path(file), @bucket_name)
+        connect!
+        return nil unless AWS::S3::S3Object.exists?(path(file), bucket_name)
+        AWS::S3::S3Object.value(path(file), bucket_name)
       end
 
       def write(file, data)
-        s3connect!
-        AWS::S3::S3Object.store(path(file), data, @bucket_name)
+        connect!
+
+        key = path(file)
+        policy = AWS::S3::S3Object.acl(key, bucket_name) if @config[:preserve_permissions]
+
+        AWS::S3::S3Object.store(path(file), data, bucket_name)
+        AWS::S3::S3Object.acl(key, bucket_name, policy) unless policy.nil?
       end
 
       def delete(file)
-        s3connect!
-        AWS::S3::S3Object.delete(path(file), @bucket_name)
+        connect!
+        AWS::S3::S3Object.delete(path(file), bucket_name)
       end
       
       def to_s
-        "s3://#{@access_key_id}@#{@bucket_name}/#{@path}"
+        "s3://#{@config[:access_key_id]}@#{bucket_name}/#{@config[:path]}"
       end
 
       protected
       
-      def s3connect!
+      def connect!
         options = {
-          access_key_id: @access_key_id,
-          secret_access_key: @secret_access_key,
+          access_key_id: @config[:access_key_id],
+          secret_access_key: @config[:secret_access_key],
           use_ssl: true
         }
 
-        options[:server] = @host if @host
+        options[:server] = @config[:host] if @config[:host]
         AWS::S3::Base.establish_connection!(options) unless AWS::S3::Base.connected?
+      end
+
+      def bucket_name
+        @config[:bucket_name]
       end
             
       def path(file)
-        if @path and !@path.empty?
-          "#{@path}/#{file}"
+        if @config[:path] and !@config[:path].empty?
+          "#{@config[:path]}/#{file}"
         else
           file
         end

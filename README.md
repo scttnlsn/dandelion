@@ -96,6 +96,7 @@ Required:
 Optional:
 
  * `host` (defaults to s3.amazonaws.com)
+ * `preserve_permissions` (defaults to true)
 
 Usage
 -----
