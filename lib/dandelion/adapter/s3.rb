@@ -21,7 +21,11 @@ module Dandelion
         connect!
 
         key = path(file)
-        policy = AWS::S3::S3Object.acl(key, bucket_name) if @config[:preserve_permissions]
+        
+        begin
+          policy = AWS::S3::S3Object.acl(key, bucket_name) if @config[:preserve_permissions]
+        rescue AWS::S3::NoSuchKey
+        end
 
         AWS::S3::S3Object.store(path(file), data, bucket_name)
         AWS::S3::S3Object.acl(key, bucket_name, policy) unless policy.nil?
