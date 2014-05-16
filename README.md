@@ -65,7 +65,7 @@ Required:
 
  * `host`
  * `username`
- * `password`
+ * `password` (not required if you're using an SSH key)
 
 Optional:
 
