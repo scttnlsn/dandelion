@@ -50,6 +50,7 @@ module Dandelion
         }
 
         options[:server] = @config[:host] if @config[:host]
+        AWS::S3::DEFAULT_HOST.replace options[:server] if options[:server]
         AWS::S3::Base.establish_connection!(options) unless AWS::S3::Base.connected?
       end
 
