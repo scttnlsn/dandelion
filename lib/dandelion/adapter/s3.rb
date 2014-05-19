@@ -49,7 +49,7 @@ module Dandelion
           use_ssl: true
         }
 
-        options[:server] = @config[:host] if @config[:host]
+        AWS::S3::DEFAULT_HOST.replace @config[:host] if @config[:host]
         AWS::S3::Base.establish_connection!(options) unless AWS::S3::Base.connected?
       end
 
