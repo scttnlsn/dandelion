@@ -41,7 +41,7 @@
 <h2>
 <a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
 
-<p>Ensure that Ruby &gt;= 1.9 is installed, then run:</p>
+<p>Ensure that Ruby &gt;= 1.9.2 is installed, then run:</p>
 
 <pre><code>$ gem install dandelion
 </code></pre>
@@ -63,7 +63,7 @@ Git repository is searched for a file named <code>dandelion.yml</code>).</p>
 <span class="l-Scalar-Plain">exclude</span><span class="p-Indicator">:</span>
     <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">.gitignore</span>
     <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">dandelion.yml</span>
-    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">folder/</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">dir/</span>
 
 <span class="l-Scalar-Plain">additional</span><span class="p-Indicator">:</span>
     <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">config/auth.yml</span>
@@ -87,7 +87,16 @@ Git repository is searched for a file named <code>dandelion.yml</code>).</p>
 <code>additional</code> (additional list of files from your working directory that will be deployed)</li>
 <li>
 <code>revision_file</code> (remote file in which revision SHA is stored, defaults to .revision)</li>
-</ul><p>Each adapter also has additional required and optional configuration parameters (see below).</p>
+</ul><p>The <code>additional</code> section can either take a list of local file names or key-value formats if you want to upload something to a specific path:</p>
+
+<pre><code>additional:
+    - localdir: remotedir
+    - file.txt: remotedir/file.txt
+</code></pre>
+
+<p>The <code>localdir</code> in this example is relative to the repository root (ignoring <code>local_path</code> if you set it).</p>
+
+<p>Each adapter also has additional required and optional configuration parameters (see below).</p>
 
 <h2>
 <a name="adapters" class="anchor" href="#adapters"><span class="octicon octicon-link"></span></a>Adapters</h2>
