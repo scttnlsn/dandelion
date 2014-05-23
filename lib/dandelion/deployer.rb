@@ -39,7 +39,7 @@ module Dandelion
 
     def deploy_file!(local_path, remote_path)
       log.debug("Writing file:  #{local_path} -> #{remote_path}")
-      @adapter.write(remote_path, IO.read(local_path))
+      @adapter.write(remote_path, IO.binread(local_path))
     end
 
     def deploy_change!(change)

@@ -42,7 +42,7 @@ module Dandelion
       path = object.read_raw.data
 
       result = data(path)
-      result ||= IO.read(path) # external link
+      result ||= IO.binread(path) # external link
       result
     end
   end

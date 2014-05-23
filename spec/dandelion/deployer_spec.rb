@@ -33,10 +33,10 @@ describe Dandelion::Deployer do
 
   describe '#deploy_files!' do
     before(:each) do
-      IO.stub(:read).with('a.txt').and_return('A')
-      IO.stub(:read).with('b.txt').and_return('B')
-      IO.stub(:read).with('c/a.txt').and_return('cA')
-      IO.stub(:read).with('c/b.txt').and_return('cB')
+      IO.stub(:binread).with('a.txt').and_return('A')
+      IO.stub(:binread).with('b.txt').and_return('B')
+      IO.stub(:binread).with('c/a.txt').and_return('cA')
+      IO.stub(:binread).with('c/b.txt').and_return('cB')
     end
 
     context 'local paths' do
