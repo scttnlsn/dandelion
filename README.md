@@ -38,6 +38,14 @@ additional:
     - config/auth.yml
 ```
 
+The `additional` section can also take key-value formats if you want to upload something to a specific path:
+```
+additional:
+    - localfolder: remotefolder
+    - file.txt: remotefolder/file.txt
+```
+The `localfolder` in this example is relative to the repository root (ignoring `local_path` if you set it).
+
 Required:
 
  * `adapter` (alias: `scheme`, the file transfer adapter)
