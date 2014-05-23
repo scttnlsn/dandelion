@@ -10,7 +10,7 @@ Incremental Git repository deployment.
 Install
 -------
 
-Ensure that Ruby >= 1.9 is installed, then run:
+Ensure that Ruby >= 1.9.2 is installed, then run:
 
     $ gem install dandelion
 
@@ -32,19 +32,11 @@ path: path/to/deployment
 exclude:
     - .gitignore
     - dandelion.yml
-    - folder/
+    - dir/
 
 additional:
     - config/auth.yml
 ```
-
-The `additional` section can also take key-value formats if you want to upload something to a specific path:
-```
-additional:
-    - localfolder: remotefolder
-    - file.txt: remotefolder/file.txt
-```
-The `localfolder` in this example is relative to the repository root (ignoring `local_path` if you set it).
 
 Required:
 
@@ -57,6 +49,14 @@ Optional:
 * `exclude` (list of files or directories to exclude from deployment, if `local_path` is set files are relative to that path)
 * `additional` (additional list of files from your working directory that will be deployed)
 * `revision_file` (remote file in which revision SHA is stored, defaults to .revision)
+
+The `additional` section can either take a list of local file names or key-value formats if you want to upload something to a specific path:
+```
+additional:
+    - localdir: remotedir
+    - file.txt: remotedir/file.txt
+```
+The `localdir` in this example is relative to the repository root (ignoring `local_path` if you set it).
 
 Each adapter also has additional required and optional configuration parameters (see below).
 
