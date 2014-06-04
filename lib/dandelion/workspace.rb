@@ -70,10 +70,9 @@ module Dandelion
     end
 
     def remote_sha
-      begin
-        @remote_sha ||= @adapter.read(@config[:revision_file]).chomp
-      rescue NoMethodError
-        @remote_sha
+      @remote_sha ||= begin
+        sha = @adapter.read(@config[:revision_file])
+        sha.chomp if sha
       end
     end
 
