@@ -70,7 +70,10 @@ module Dandelion
     end
 
     def remote_sha
-      @remote_sha ||= @adapter.read(@config[:revision_file])
+      @remote_sha ||= begin
+        sha = @adapter.read(@config[:revision_file])
+        sha.chomp if sha
+      end
     end
 
     def remote_sha=(sha)
