@@ -67,7 +67,8 @@ There is support for multiple backend file transfer adapters.  The configuration
 must specify one of these adapters and the set of additional parameters required
 by the given adapter.
 
-**SFTP**: `adapter: sftp` *(honors ssh config files, allowing public key auth)*
+**SFTP**: `adapter: sftp` *(honors [ssh config
+files](http://www.howtogeek.com/75007/stupid-geek-tricks-use-your-ssh-config-file-to-create-aliases-for-hosts/))*
 
 Required:
 
