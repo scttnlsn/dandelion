@@ -67,7 +67,7 @@ There is support for multiple backend file transfer adapters.  The configuration
 must specify one of these adapters and the set of additional parameters required
 by the given adapter.
 
-**SFTP**: `adapter: sftp`
+**SFTP**: `adapter: sftp` (honors SSH config files)
 
 Required:
 
@@ -134,9 +134,12 @@ For a more complete summary of usage options, run:
     Available commands:
         deploy
         status
-
+        
 Note that when specifying the repository or configuration file, the given paths
-are relative to the current working directory (not the repository root).  To see
-the options for a particular command, run:
+are relative to the current working directory (not the repository root).
+        
+To see the options for a particular command, run `dandelion <command> -h`:
 
-    $ dandelion <command> -h
+    $ dandelion deploy -h
+    Usage: dandelion deploy [options] [<revision>]
+            --dry-run                    Show what would have been deployed
