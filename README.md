@@ -93,6 +93,22 @@ Optional:
  * `port` (defaults to 21)
  * `passive` (defaults to false)
 
+**FTPS**: `adapter: ftps` (ftp over TLS, based on [DoubleBagFTPS](https://github.com/bnix/double-bag-ftps) and Dandelions native FTP adapter)
+
+Required: (same as FTP)
+
+ * `host`
+ * `username`
+ * `password`
+
+Optional: (in addition to options for FTP)
+
+ * `port`
+ * `passive`
+ * `auth_tls` (default false)
+ * `ftps_implicit` (default false: explicit TLS)
+ * `insecure` (default false, true to allow self-signed certificates)
+
 **Amazon S3**: `adapter: s3`
 
 Required:
