@@ -42,4 +42,5 @@ end
 require 'dandelion/adapter/noop'
 require 'dandelion/adapter/ftp'
 require 'dandelion/adapter/sftp'
+require 'dandelion/adapter/ftps'
 require 'dandelion/adapter/s3'
