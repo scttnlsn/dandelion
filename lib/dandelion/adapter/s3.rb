@@ -3,10 +3,10 @@ module Dandelion
     class S3 < Adapter::Base
       adapter 's3'
       requires_gems 'aws-s3'
-      
+
       def initialize(config)
         require 'aws/s3'
-        
+
         @config = config
         @config.defaults(preserve_permissions: true)
       end
@@ -21,7 +21,7 @@ module Dandelion
         connect!
 
         key = path(file)
-        
+
         begin
           policy = AWS::S3::S3Object.acl(key, bucket_name) if @config[:preserve_permissions]
         rescue AWS::S3::NoSuchKey
@@ -35,13 +35,13 @@ module Dandelion
         connect!
         AWS::S3::S3Object.delete(path(file), bucket_name)
       end
-      
+
       def to_s
         "s3://#{@config[:access_key_id]}@#{bucket_name}/#{@config[:path]}"
       end
 
-      protected
-      
+    protected
+
       def connect!
         options = {
           access_key_id: @config[:access_key_id],
@@ -56,7 +56,7 @@ module Dandelion
       def bucket_name
         @config[:bucket_name]
       end
-            
+
       def path(file)
         if @config[:path] and !@config[:path].empty?
           "#{@config[:path]}/#{file}"

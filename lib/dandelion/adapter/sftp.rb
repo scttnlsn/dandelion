@@ -8,7 +8,7 @@ module Dandelion
 
       adapter 'sftp'
       requires_gems 'net-sftp'
-      
+
       def initialize(config)
         require 'net/sftp'
 
@@ -54,12 +54,12 @@ module Dandelion
           raise unless e.code == 2
         end
       end
-      
+
       def to_s
         "sftp://#{@config['username']}@#{@config['host']}/#{@config['path']}"
       end
 
-      private
+    private
 
       def sftp_client
         options = {
@@ -87,7 +87,7 @@ module Dandelion
           end
         end
       end
-      
+
       def empty?(dir)
         @sftp.dir.entries(dir).delete_if do |file|
           file.name == '.' or file.name == '..'
@@ -103,7 +103,7 @@ module Dandelion
           @sftp.mkdir!(dir)
         end
       end
-      
+
       def path(file)
         if @config['path'] and !@config['path'].empty?
           File.join(@config['path'], file)

@@ -6,7 +6,7 @@ module Dandelion
       include ::Dandelion::Utils
 
       adapter 'ftp'
-      
+
       def initialize(config)
         require 'net/ftp'
 
@@ -43,12 +43,12 @@ module Dandelion
         rescue Net::FTPPermError => e
         end
       end
-      
+
       def to_s
         "ftp://#{@config['username']}@#{@config['host']}/#{@config['path']}"
       end
 
-      private
+    private
 
       def ftp_client
         ftp = Net::FTP.new
@@ -82,7 +82,7 @@ module Dandelion
           end
         end
       end
-      
+
       def to_b(value)
         return [true, 'true', 1, '1', 'T', 't'].include?(value.class == String ? value.downcase : value)
       end
