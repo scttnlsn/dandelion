@@ -149,6 +149,7 @@ For a more complete summary of usage options, run:
 
     Available commands:
         deploy
+        init
         status
         
 Note that when specifying the repository or configuration file, the given paths
