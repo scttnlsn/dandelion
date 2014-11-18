@@ -28,7 +28,6 @@ module Dandelion
         end
 
         ftps.login(@config['username'], @config['password'], nil, ftps_auth)
-        ftps.chdir(@config['path']) if @config['path']
         ftps.passive = @config[:passive]
 
         ftps

@@ -19,7 +19,7 @@ module Dandelion
 
       def read(file)
         begin
-          @ftp.getbinaryfile(file, nil)
+          @ftp.getbinaryfile(path(file), nil)
         rescue Net::FTPPermError => e
           nil
         end
@@ -28,18 +28,19 @@ module Dandelion
       def write(file, data)
         temp(file, data) do |temp|
           begin
-            @ftp.putbinaryfile(temp, file)
+            @ftp.putbinaryfile(temp, path(file))
           rescue Net::FTPPermError => e
-            mkdir_p(File.dirname(file))
-            @ftp.putbinaryfile(temp, file)
+            raise e unless e.to_s =~ /553/
+            mkdir_p(File.dirname(path(file)))
+            @ftp.putbinaryfile(temp, path(file))
           end
         end
       end
 
       def delete(file)
         begin
-          @ftp.delete(file)
-          cleanup(File.dirname(file))
+          @ftp.delete(path(file))
+          cleanup(File.dirname(path(file)))
         rescue Net::FTPPermError => e
         end
       end
@@ -55,7 +56,6 @@ module Dandelion
         ftp.connect(@config['host'], @config['port'])
         ftp.login(@config['username'], @config['password'])
         ftp.passive = @config['passive']
-        ftp.chdir(@config['path']) if @config['path']
         ftp
       end
 
@@ -80,6 +80,14 @@ module Dandelion
             mkdir_p(File.dirname(dir))
             @ftp.mkdir(dir)
           end
+        end
+      end
+
+      def path(file)
+        if @config['path'] and !@config['path'].empty?
+          File.join(@config['path'], file)
+        else
+          file
         end
       end
 
