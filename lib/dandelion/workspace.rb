@@ -3,7 +3,7 @@ module Dandelion
 
   class Workspace
     attr_reader :adapter, :config
-    
+
     def initialize(repo, adapter, config = nil)
       @repo = repo
       @adapter = adapter
@@ -60,13 +60,13 @@ module Dandelion
 
     def lookup_ref(val)
       ref = @repo.ref(val)
-      lookup_sha(ref.target) if ref
+      lookup_sha(ref.target.oid) if ref
     rescue Rugged::ReferenceError
       nil
     end
 
     def local_sha
-      @config[:revision] || @repo.head.target
+      @config[:revision] || @repo.head.target.oid
     end
 
     def remote_sha
