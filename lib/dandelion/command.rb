@@ -83,4 +83,5 @@ module Dandelion
 end
 
 require 'dandelion/command/deploy'
+require 'dandelion/command/init'
 require 'dandelion/command/status'

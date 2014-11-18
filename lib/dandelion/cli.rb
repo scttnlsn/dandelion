@@ -4,7 +4,7 @@ module Dandelion
   class CLI
     def initialize(args)
       @args = args
-      
+
       @options = {}
       @options[:help] = true if @args.length == 0
 
@@ -47,6 +47,10 @@ module Dandelion
 
     def execute!
       parse!(@parser)
+
+      if @args.length == 0
+        @options[:help] = true
+      end
 
       if @options[:help]
         display_help

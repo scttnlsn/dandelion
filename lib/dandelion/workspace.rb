@@ -38,8 +38,6 @@ module Dandelion
       self.remote_sha = commit.oid
     end
 
-  private
-
     def lookup(val)
       result = lookup_sha(val) ||
         lookup_ref(val) ||
@@ -51,6 +49,8 @@ module Dandelion
 
       result
     end
+
+  private
 
     def lookup_sha(val)
       @repo.lookup(val)
