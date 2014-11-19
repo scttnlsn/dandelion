@@ -30,7 +30,7 @@ module Dandelion
           begin
             @ftp.putbinaryfile(temp, path(file))
           rescue Net::FTPPermError => e
-            raise e unless e.to_s =~ /553/
+            raise e unless e.to_s =~ /550|553/
             mkdir_p(File.dirname(path(file)))
             @ftp.putbinaryfile(temp, path(file))
           end
