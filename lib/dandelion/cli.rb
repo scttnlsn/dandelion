@@ -46,19 +46,19 @@ module Dandelion
     end
 
     def execute!
-      parse!(@parser)
-
       if @args.length == 0
         @options[:help] = true
+      end
+      
+      parse!(@parser)
+
+      if @options[:version]
+        log.info("Dandelion #{Dandelion::VERSION}")
+        exit
       end
 
       if @options[:help]
         display_help
-        exit
-      end
-
-      if @options[:version]
-        log.info("Dandelion #{Dandelion::VERSION}")
         exit
       end
 
