@@ -1,7 +1,7 @@
 module Dandelion
   class Changeset
     include Enumerable
-    
+
     def initialize(tree, commit, options = {})
       @tree = tree
       @commit = commit
@@ -33,16 +33,20 @@ module Dandelion
 
   private
 
+    def expand_path(path)
+      File.expand_path(path).to_s
+    end
+
     def local_path
-      @options[:local_path] || ''
+      expand_path(@options[:local_path] || '')
     end
 
     def applicable?(path)
-      path.start_with?(local_path)
+      expand_path(path).start_with?(expand_path(local_path))
     end
 
     def transform_path(path)
-      trimmed = path[local_path.length..-1]
+      trimmed = expand_path(path)[expand_path(local_path).length..-1]
       trimmed = trimmed[1..-1] if trimmed[0] == File::SEPARATOR
       trimmed
     end

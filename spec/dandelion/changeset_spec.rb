@@ -27,7 +27,7 @@ describe Dandelion::Changeset do
   end
 
   context 'non-empty local path' do
-    let(:changeset) { test_changeset(local_path: 'baz') }
+    let(:changeset) { test_changeset(local_path: './baz') }
 
     describe '#enumerable' do
       let(:changes) { changeset.to_a }
