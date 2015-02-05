@@ -53,7 +53,7 @@ describe Dandelion::Changeset do
 
   context 'empty diff' do
     let(:changeset) { test_changeset }
-    before(:each) { changeset.stub(:diff).and_return([]) }
+    before(:each) { allow(changeset).to receive(:diff) { [] } }
 
     describe '#enumerable' do
       let(:changes) { changeset.to_a }

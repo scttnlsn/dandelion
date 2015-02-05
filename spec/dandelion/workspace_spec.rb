@@ -55,7 +55,7 @@ describe Dandelion::Workspace do
 
   describe '#remote_commit' do
     before(:each) do
-      adapter.stub(:read).with('.revision').and_return(initial_revision)
+      allow(adapter).to receive(:read).with('.revision').and_return(initial_revision)
     end
 
     it 'returns commit for revision read from adapter' do
@@ -65,7 +65,7 @@ describe Dandelion::Workspace do
 
   describe '#remote_commit=' do
     it 'writes commit revision to adapter' do
-      adapter.should_receive(:write).with('.revision', head_revision)
+      allow(adapter).to receive(:write).with('.revision', head_revision)
       workspace.remote_commit = workspace.local_commit
     end
   end
@@ -73,7 +73,7 @@ describe Dandelion::Workspace do
   describe '#tree' do
     it 'returns tree for repo and local commit' do
       tree = double()
-      Dandelion::Tree.should_receive(:new).with(test_repo, workspace.local_commit).and_return(tree)
+      expect(Dandelion::Tree).to receive(:new).with(test_repo, workspace.local_commit).and_return(tree)
       expect(workspace.tree).to eq tree
     end
   end
@@ -84,10 +84,10 @@ describe Dandelion::Workspace do
       tree = double('tree')
       remote_commit = double('remote_commit')
 
-      workspace.stub(:tree).and_return(tree)
-      workspace.stub(:remote_commit).and_return(remote_commit)
+      allow(workspace).to receive(:tree).and_return(tree)
+      allow(workspace).to receive(:remote_commit).and_return(remote_commit)
 
-      Dandelion::Changeset.should_receive(:new).with(tree, remote_commit, workspace.config).and_return(changeset)
+      allow(Dandelion::Changeset).to receive(:new).with(tree, remote_commit, workspace.config).and_return(changeset)
 
       expect(workspace.changeset).to eq changeset
     end

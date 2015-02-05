@@ -11,7 +11,7 @@ describe Dandelion::Command::Init do
     before { command.setup([revision]) }
 
     it 'sets remote revision to specified revision' do
-      workspace.should_receive(:remote_commit=).with(workspace.lookup(revision))
+      expect(workspace).to receive(:remote_commit=).with(workspace.lookup(revision))
       command.execute!
     end
   end

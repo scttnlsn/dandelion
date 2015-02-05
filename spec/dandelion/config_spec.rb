@@ -10,7 +10,7 @@ describe Dandelion::Config do
 
   before(:each) do
     ENV['BAZ'] = 'qux'
-    IO.should_receive(:read).with('foo').and_return(yaml)
+    expect(IO).to receive(:read).with('foo').and_return(yaml)
   end
 
   let(:config) { Dandelion::Config.new(path: 'foo') }

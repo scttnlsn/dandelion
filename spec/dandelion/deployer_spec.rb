@@ -12,9 +12,9 @@ describe Dandelion::Deployer do
     ]}
 
     it 'perfoms writes and deletions on adapter' do
-      adapter.should_receive(:write).with('foo', 'bar')
-      adapter.should_receive(:write).with('bar/baz', 'baz')
-      adapter.should_receive(:delete).with('qux')
+      expect(adapter).to receive(:write).with('foo', 'bar')
+      expect(adapter).to receive(:write).with('bar/baz', 'baz')
+      expect(adapter).to receive(:delete).with('qux')
 
       deployer.deploy_changeset!(changeset)
     end
@@ -23,8 +23,8 @@ describe Dandelion::Deployer do
       let(:deployer) { Dandelion::Deployer.new(adapter, exclude: ['foo']) }
 
       it 'perfoms writes and deletions on adapter' do
-        adapter.should_receive(:write).with('bar/baz', 'baz')
-        adapter.should_receive(:delete).with('qux')
+        expect(adapter).to receive(:write).with('bar/baz', 'baz')
+        expect(adapter).to receive(:delete).with('qux')
 
         deployer.deploy_changeset!(changeset)
       end
@@ -33,18 +33,18 @@ describe Dandelion::Deployer do
 
   describe '#deploy_files!' do
     before(:each) do
-      IO.stub(:binread).with('a.txt').and_return('A')
-      IO.stub(:binread).with('b.txt').and_return('B')
-      IO.stub(:binread).with('c/a.txt').and_return('cA')
-      IO.stub(:binread).with('c/b.txt').and_return('cB')
+      allow(IO).to receive(:binread).with('a.txt').and_return('A')
+      allow(IO).to receive(:binread).with('b.txt').and_return('B')
+      allow(IO).to receive(:binread).with('c/a.txt').and_return('cA')
+      allow(IO).to receive(:binread).with('c/b.txt').and_return('cB')
     end
 
     context 'local paths' do
       let(:files) { ['a.txt', 'b.txt'] }
 
       it 'performs writes on adapter' do
-        adapter.should_receive(:write).with('a.txt', 'A')
-        adapter.should_receive(:write).with('b.txt', 'B')
+        expect(adapter).to receive(:write).with('a.txt', 'A')
+        expect(adapter).to receive(:write).with('b.txt', 'B')
 
         deployer.deploy_files!(files)
       end
@@ -57,8 +57,8 @@ describe Dandelion::Deployer do
       ]}
 
       it 'performs writes on adapter' do
-        adapter.should_receive(:write).with('files/a.txt', 'A')
-        adapter.should_receive(:write).with('files/b.txt', 'B')
+        expect(adapter).to receive(:write).with('files/a.txt', 'A')
+        expect(adapter).to receive(:write).with('files/b.txt', 'B')
 
         deployer.deploy_files!(files)
       end
@@ -70,15 +70,15 @@ describe Dandelion::Deployer do
       ]}
 
       before(:each) do
-        File.stub(:directory?).with('c/').and_return(true)
-        File.stub(:directory?).with('c/a.txt').and_return(false)
-        File.stub(:directory?).with('c/b.txt').and_return(false)
-        Dir.stub(:glob).with('c/**/*').and_return(['c/a.txt', 'c/b.txt'])
+        allow(File).to receive(:directory?).with('c/').and_return(true)
+        allow(File).to receive(:directory?).with('c/a.txt').and_return(false)
+        allow(File).to receive(:directory?).with('c/b.txt').and_return(false)
+        allow(Dir).to receive(:glob).with('c/**/*').and_return(['c/a.txt', 'c/b.txt'])
       end
 
       it 'performs writes on adapter' do
-        adapter.should_receive(:write).with('C/a.txt', 'cA')
-        adapter.should_receive(:write).with('C/b.txt', 'cB')
+        expect(adapter).to receive(:write).with('C/a.txt', 'cA')
+        expect(adapter).to receive(:write).with('C/b.txt', 'cB')
 
         deployer.deploy_files!(files)
       end

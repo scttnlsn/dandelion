@@ -22,7 +22,7 @@ describe Dandelion::Command::Deploy do
   describe '#deployer_adapter' do
     it 'returns workspace adapter' do
       adapter = double('adapter')
-      workspace.should_receive(:adapter).and_return(adapter)
+      expect(workspace).to receive(:adapter).and_return(adapter)
       expect(command.deployer_adapter).to eq adapter
     end
 
@@ -31,18 +31,18 @@ describe Dandelion::Command::Deploy do
 
       it 'uses no-op adapter' do
         noop = double('no-op adapter')
-        Dandelion::Adapter::NoOpAdapter.should_receive(:new).with(command.config).and_return(noop)
+        expect(Dandelion::Adapter::NoOpAdapter).to receive(:new).with(command.config).and_return(noop)
         expect(command.deployer_adapter).to eq noop
       end
     end
   end
 
   describe '#deployer' do
-    before(:each) { command.stub(:adapter).and_return(double('adapter')) }
+    before(:each) { allow(command).to receive(:adapter).and_return(double('adapter')) }
 
     it 'creates deployer for adapter, and config' do
       deployer = double('deployer')
-      Dandelion::Deployer.should_receive(:new).with(command.deployer_adapter, command.config).and_return(deployer)
+      expect(Dandelion::Deployer).to receive(:new).with(command.deployer_adapter, command.config).and_return(deployer)
       expect(command.deployer).to eq deployer
     end
   end
@@ -63,47 +63,47 @@ describe Dandelion::Command::Deploy do
     let(:changeset) { double('changeset') }
 
     before(:each) do
-      workspace.stub(:changeset).and_return(changeset)
-      command.stub(:deployer).and_return(deployer)
+      allow(workspace).to receive(:changeset) { changeset }
+      allow(command).to receive(:deployer) { deployer }
     end
 
     context 'empty changeset' do
-      before(:each) { changeset.stub(:empty?).and_return(true) }
+      before(:each) { allow(changeset).to receive(:empty?) { true } }
 
       it 'does nothing' do
-        deployer.should_not_receive(:deploy!)
+        expect(deployer).to_not receive(:deploy!)
       end
     end
 
     context 'non-empty changeset' do
       before(:each) do
-        deployer.stub(:deploy_changeset!)
-        changeset.stub(:empty?).and_return(false)
+        allow(deployer).to receive(:deploy_changeset!)
+        allow(changeset).to receive(:empty?) { false }
       end
 
       it 'deploys changeset' do
-        deployer.should_receive(:deploy_changeset!).with(changeset)
+        expect(deployer).to receive(:deploy_changeset!).with(changeset)
         command.execute!
       end
 
       it 'sets remote revision to local revision' do
-        workspace.should_receive(:remote_commit=).with(workspace.local_commit)
+        expect(workspace).to receive(:remote_commit=).with(workspace.local_commit)
         command.execute!
       end
     end
 
     context 'non-empty additional files' do
       before(:each) do
-        changeset.stub(:empty?).and_return(true)
+        allow(changeset).to receive(:empty?) { true }
       end
 
       before(:each) do
-        deployer.stub(:deploy_files!)
+        allow(deployer).to receive(:deploy_files!)
         config[:additional] = ['foo']
       end
 
       it 'deploys files' do
-        deployer.should_receive(:deploy_files!).with(['foo'])
+        expect(deployer).to receive(:deploy_files!).with(['foo'])
         command.execute!
       end
     end
