@@ -14,6 +14,14 @@ Ensure that Ruby >= 1.9.2 is installed, then run:
 
     $ gem install dandelion
 
+You may need to install `cmake` before installing Dandelion.  It's likely available in your OS package manager.  For example:
+
+    $ brew install cmake
+
+or
+
+    $ apt-get install cmake
+
 Config
 ------
 
@@ -151,10 +159,10 @@ For a more complete summary of usage options, run:
         deploy
         init
         status
-        
+
 Note that when specifying the repository or configuration file, the given paths
 are relative to the current working directory (not the repository root).
-        
+
 To see the options for a particular command, run `dandelion <command> -h`:
 
     $ dandelion deploy -h
