@@ -13,6 +13,10 @@ Install
 Ensure that Ruby >= 1.9.2 is installed, then run:
 
     $ gem install dandelion
+    
+You might need Cmake to manage some build processes. To install it, run:
+
+    $ apt-get install cmake
 
 Config
 ------
