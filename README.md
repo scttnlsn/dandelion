@@ -124,10 +124,10 @@ Required:
  * `access_key_id`
  * `secret_access_key`
  * `bucket_name`
+ * `host` (one of the endpoints listed [here](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region), defaults to s3.amazonaws.com)
 
 Optional:
 
- * `host` (defaults to s3.amazonaws.com)
  * `preserve_permissions` (defaults to true)
 
 Usage
