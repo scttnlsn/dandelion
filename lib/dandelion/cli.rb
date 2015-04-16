@@ -49,7 +49,7 @@ module Dandelion
       if @args.length == 0
         @options[:help] = true
       end
-      
+
       parse!(@parser)
 
       if @options[:version]
@@ -87,12 +87,19 @@ module Dandelion
       if @options[:repo]
         File.expand_path(@options[:repo])
       else
-        closest_repo(File.expand_path('.'))
+        Rugged::Repository.discover(File.expand_path('.'))
       end
     end
 
+    def repo_exists?
+      return !!(repo)
+    rescue ::IOError, ::Rugged::OSError
+      # squash exceptions for instantiating Rugged repo
+      return false
+    end
+
     def validate!
-      unless File.exists?(File.join(repo_path, '.git'))
+      unless repo_exists?
         log.fatal("Not a git repository: #{repo_path}")
         exit 1
       end
@@ -110,14 +117,6 @@ module Dandelion
         log.fatal(e.to_s.capitalize)
         display_help
         exit 1
-      end
-    end
-
-    def closest_repo(dir)
-      if File.exists?(File.join(dir, '.git'))
-        dir
-      else
-        File.dirname(dir) != dir && closest_repo(File.dirname(dir)) || File.expand_path('.')
       end
     end
 
