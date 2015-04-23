@@ -20,5 +20,14 @@ describe Dandelion::Tree do
         expect(tree.data('link')).to eq "bar\n"
       end
     end
+
+    context 'submodule' do
+      let(:repo) { test_repo('repo_submodule') }
+      let(:tree) { test_tree(repo: repo, commit: repo.lookup('ed393d7ff451fb04e9ea7c435e09303783106015')) }
+
+      it 'does not raise error' do
+        tree.data('repo')
+      end
+    end
   end
 end
