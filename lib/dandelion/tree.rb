@@ -8,6 +8,20 @@ module Dandelion
     end
 
     def data(path)
+      submodule = @repo.submodules[path]
+
+      if submodule
+        # TODO
+        nil
+      else
+        info, obj = object(path)
+        content(info, obj)
+      end
+    end
+
+    private
+
+    def object(path)
       object = @commit.tree
       info = {}
 
@@ -17,13 +31,12 @@ module Dandelion
         return nil unless info[:type]
 
         object = @repo.lookup(info[:oid])
+
         return nil unless object
       end
 
-      content(info, object)
+      [info, object]
     end
-
-  private
 
     def content(info, object)
       # https://github.com/libgit2/libgit2/blob/development/include/git2/types.h
