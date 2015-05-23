@@ -77,17 +77,26 @@ module Dandelion
       end
     end
 
-  private
+    private
 
     def config_path
-      @options[:config] || File.join(repo_path, 'dandelion.yml')
+      if @options[:config]
+        @options[:config]
+      else
+        paths = [
+          File.join(repo_path, 'dandelion.yml'),
+          File.join(repo_path, 'dandelion.yaml')
+        ]
+
+        paths.drop_while { |path| !path || !File.exists?(path) }.first
+      end
     end
 
     def repo_path
       if @options[:repo]
         File.expand_path(@options[:repo])
       else
-        Rugged::Repository.discover(File.expand_path('.'))
+        File.expand_path('.')
       end
     end
 
@@ -104,7 +113,7 @@ module Dandelion
         exit 1
       end
 
-      unless File.exists?(config_path)
+      unless config_path
         log.fatal("Missing config file: #{config_path}")
         exit 1
       end
