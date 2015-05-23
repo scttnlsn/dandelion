@@ -113,7 +113,7 @@ module Dandelion
         exit 1
       end
 
-      unless config_path
+      unless File.exists?(config_path)
         log.fatal("Missing config file: #{config_path}")
         exit 1
       end
