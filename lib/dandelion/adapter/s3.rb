@@ -27,6 +27,7 @@ module Dandelion
         rescue AWS::S3::NoSuchKey
         end
 
+        # Set caching options
         options = {}
         options.cache_control = "max-age=#{@config[:cache_control]}" if @config[:cache_control]
         options.expires = @config[:expires] if @config[:expires]
