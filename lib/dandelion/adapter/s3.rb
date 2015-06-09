@@ -29,8 +29,8 @@ module Dandelion
 
         # Set caching options
         options = {}
-        options.cache_control = "max-age=#{@config[:cache_control]}" if @config[:cache_control]
-        options.expires = @config[:expires] if @config[:expires]
+        options[:cache_control] = "max-age=#{@config[:cache_control]}" if @config[:cache_control]
+        options[:expires] = @config[:expires] if @config[:expires]
 
         AWS::S3::S3Object.store(path(file), data, bucket_name, options)
         AWS::S3::S3Object.acl(key, bucket_name, policy) unless policy.nil?
