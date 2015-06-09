@@ -88,7 +88,7 @@ module Dandelion
           File.join(repo_path, 'dandelion.yaml')
         ]
 
-        paths.drop_while { |path| !path || !File.exists?(path) }.first
+        paths.drop_while { |path| !path || !File.exists?(path) }.first || paths.first
       end
     end
 
