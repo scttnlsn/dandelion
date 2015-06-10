@@ -129,6 +129,8 @@ Required:
 Optional:
 
  * `preserve_permissions` (defaults to true)
+ * `cache_control` (time to cache content in seconds, e.g. '1296000')
+ * `expires` (time to cache content in seconds, e.g. '1296000')
 
 Usage
 -----
