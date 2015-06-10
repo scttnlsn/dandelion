@@ -102,7 +102,7 @@ module Dandelion
 
     def repo_exists?
       return !!(repo)
-    rescue ::IOError, ::Rugged::OSError
+    rescue ::IOError, ::Rugged::OSError, ::Rugged::RepositoryError
       # squash exceptions for instantiating Rugged repo
       return false
     end
