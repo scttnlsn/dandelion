@@ -23,12 +23,14 @@ module Dandelion
 
         local_commit = workspace.local_commit
         remote_commit = workspace.remote_commit
-        
+
         log.info("Remote revision:    #{remote_commit ? remote_commit.oid : '---'}")
         log.info("Deploying revision: #{local_commit.oid}")
 
         deploy_changeset!
-        deploy_additional_files!        
+        deploy_additional_files!
+
+        cloudfront_invalidate! unless !@config[:cloudfront] or !@config[:cloudfront]["invalidate"] or !@config[:cloudfront]["distribution"]
       end
 
       def deployer_adapter
@@ -62,6 +64,19 @@ module Dandelion
           log.info("Deploying additional files...")
           deployer.deploy_files!(config[:additional])
         end
+      end
+
+      #
+      # Cloudfront cache invalidation
+      def cloudfront_invalidate!
+        require "cloudfront-invalidator"
+
+        # Fetch files from config or use wildcard, if none given
+        files = if @config[:cloudfront]["files"] then @config[:cloudfront]["files"] else '*' end
+
+        log.info("Invalidating Amazon Cloudfront...")
+        CloudfrontInvalidator.new(@config[:access_key_id], @config[:secret_access_key], @config[:cloudfront]["distribution"]).invalidate(files) unless options[:dry]
+        log.info("Invalidation in progress. Check your AWS console for more information.")
       end
     end
   end
