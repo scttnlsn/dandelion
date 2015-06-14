@@ -136,18 +136,18 @@ Additional:
 
 It is possible to clear Amazon Cloudfront caches if required parameters are set:
 
-    Required:
-        * `cloudfront`
-        * `distribution` (The distribution ID)
-        * `invalidate` (Can be true or false.)
+Required:
+    * `cloudfront`
+    * `distribution` (The distribution ID)
+    * `invalidate` (Can be true or false.)
 
-    Optional:
-        * `files`
+Optional:
+    * `files`
 
-    If the parameter `files` is missing the whole cloudfront distribution cache
-    will be cleared.
+If the parameter `files` is missing the whole cloudfront distribution cache
+will be cleared.
 
-    Example:
+Example:
 
 ```yaml
 cloudfront:
