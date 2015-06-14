@@ -132,6 +132,33 @@ Optional:
  * `cache_control` (time to cache content in seconds, e.g. '1296000')
  * `expires` (time to cache content in seconds, e.g. '1296000')
 
+Additional:
+
+It is possible to clear Amazon Cloudfront caches if required parameters are set:
+
+Required:
+* `cloudfront`
+* `distribution` (The distribution ID)
+* `invalidate` (Can be true or false.)
+
+Optional:
+* `files`
+
+If the parameter `files` is missing the whole cloudfront distribution cache
+will be cleared.
+
+Example:
+
+```yaml
+cloudfront:
+   distribution: "YOUR_DISTRIBUTION"
+   invalidate: true
+   files:
+        - file1
+        - /path/to/file2
+        - file3
+```
+
 Usage
 -----
 

@@ -10,4 +10,5 @@ end
 group :development do
   gem 'net-sftp'
   gem 'aws-s3'
+  gem 'cloudfront-invalidator'
 end
