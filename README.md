@@ -133,7 +133,8 @@ Optional:
  * `expires` (time to cache content in seconds, e.g. '1296000')
 
 Additional:
-    It is possible to clear Amazon Cloudfront caches if required parameters are set:
+
+It is possible to clear Amazon Cloudfront caches if required parameters are set:
 
     Required:
         * `cloudfront`
