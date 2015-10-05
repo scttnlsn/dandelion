@@ -25,5 +25,5 @@ Gem::Specification.new do |s|
 !   additional gems need to be installed.
   MSG
 
-  s.add_dependency 'rugged', '0.22.1b1'
+  s.add_dependency 'rugged', '0.23.2'
 end
