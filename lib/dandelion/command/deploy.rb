@@ -23,12 +23,12 @@ module Dandelion
 
         local_commit = workspace.local_commit
         remote_commit = workspace.remote_commit
-        
+
         log.info("Remote revision:    #{remote_commit ? remote_commit.oid : '---'}")
         log.info("Deploying revision: #{local_commit.oid}")
 
         deploy_changeset!
-        deploy_additional_files!        
+        deploy_additional_files!
       end
 
       def deployer_adapter

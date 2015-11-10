@@ -62,9 +62,9 @@ module Dandelion
         exit
       end
 
-      validate!
-
       parse!(command_class.parser(@options))
+
+      validate!
 
       command = command_class.new(workspace, config, @options)
       command.setup(@args)
