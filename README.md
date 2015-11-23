@@ -59,14 +59,20 @@ Optional:
 * `revision_file` (remote file in which revision SHA is stored, defaults to .revision)
 
 The `additional` section can either take a list of local file names or key-value formats if you want to upload something to a specific path:
-```
+
+```yaml
 additional:
     - localdir: remotedir
     - file.txt: remotedir/file.txt
 ```
+
 The `localdir` in this example is relative to the repository root (ignoring `local_path` if you set it).
 
-Each adapter also has additional required and optional configuration parameters (see below).
+Each adapter also has additional required and optional configuration parameters (see below).  Note that you can dynamically set configuration values by using environment variables.  For example:
+
+```yaml
+password: <%= ENV['DANDELION_PASSWORD'] %>
+```
 
 Adapters
 --------
