@@ -70,4 +70,30 @@ describe Dandelion::Changeset do
       end
     end
   end
+
+  context 'diff adds symlink' do
+    let(:changeset) { test_changeset_with_symlinks }
+
+    describe '#enumerable' do
+      let(:changes) { changeset.to_a }
+
+      it 'returns all changes' do
+        expect(changes).to be_a(Array)
+        expect(changes.length).to eq 1
+        expect(changes.map(&:path)).to eq ['link']
+        expect(changes.map(&:type)).to eq [:symlink]
+      end
+
+      it 'returns data for write changes' do
+        expect(changes.select { |c| c.type != :delete }.map(&:data)).to eq ["baz/bar"]
+      end
+    end
+
+    describe '#empty?' do
+      it 'returns false' do
+        expect(changeset.empty?).to eq false
+      end
+    end
+  end
+
 end

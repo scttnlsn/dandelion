@@ -16,8 +16,8 @@ describe Dandelion::Tree do
       let(:repo) { test_repo('repo_symlink') }
       let(:tree) { test_tree(repo: repo, commit: repo.lookup('4c19bbe7ba04230a0ae2281c1abbc48a76a66550')) }
 
-      it 'returns content of link source path' do
-        expect(tree.data('link')).to eq "bar\n"
+      it 'returns target path of the symlink' do
+        expect(tree.data('link')).to eq "baz/bar"
       end
     end
 

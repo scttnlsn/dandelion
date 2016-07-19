@@ -7,6 +7,11 @@ module Dandelion
       @commit = commit
     end
 
+    def is_symlink?(path)
+      # https://github.com/libgit2/libgit2/blob/development/include/git2/types.h
+      @commit.tree.path(path)[:filemode] == 0120000
+    end
+
     def data(path)
       submodule = @repo.submodules[path]
 
@@ -15,48 +20,21 @@ module Dandelion
         nil
       else
         info, obj = object(path)
-        content(info, obj)
+        blob_content(obj)
       end
     end
 
     private
 
     def object(path)
-      object = @commit.tree
-      info = {}
-
-      path.split('/').each do |name|
-        info = object[name]
-        return nil unless info
-        return nil unless info[:type]
-
-        object = @repo.lookup(info[:oid])
-
-        return nil unless object
-      end
-
+      info = @commit.tree.path(path)
+      object = @repo.lookup(info[:oid])
       [info, object]
-    end
-
-    def content(info, object)
-      # https://github.com/libgit2/libgit2/blob/development/include/git2/types.h
-      if info[:filemode] == 0120000
-        symlink_content(object)
-      else
-        blob_content(object)
-      end
     end
 
     def blob_content(object)
       object.read_raw.data
     end
 
-    def symlink_content(object)
-      path = object.read_raw.data
-
-      result = data(path)
-      result ||= IO.binread(path) # external link
-      result
-    end
   end
 end

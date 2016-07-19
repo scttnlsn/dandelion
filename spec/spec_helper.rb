@@ -27,6 +27,14 @@ def test_changeset(options = {})
   Dandelion::Changeset.new(test_tree, test_commits.first, options)
 end
 
+def test_changeset_with_symlinks(options = {})
+  repo = test_repo('repo_symlink')
+  commit0 = repo.lookup('3d9b743acb4a84dd99002d2c6f3fcf1a47e9f06b')
+  commit1 = repo.lookup('4c19bbe7ba04230a0ae2281c1abbc48a76a66550')
+  tree = test_tree(repo: repo, commit: commit1)
+  Dandelion::Changeset.new(tree, commit0, options)
+end
+
 def test_diff
   test_changeset.diff
 end
