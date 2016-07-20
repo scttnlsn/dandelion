@@ -10,8 +10,8 @@ describe Dandelion::Changeset do
       it 'returns all changes' do
         expect(changes).to be_a(Array)
         expect(changes.length).to eq 5
-        expect(changes.map(&:path)).to eq ['bar', 'baz/bar', 'baz/foo', 'foo', 'qux']
-        expect(changes.map(&:type)).to eq [:delete, :write, :delete, :write, :write]
+        expect(changes.map(&:path)).to eq ['bar', 'baz/foo', 'baz/bar', 'foo', 'qux']
+        expect(changes.map(&:type)).to eq [:delete, :delete, :write, :write, :write]
       end
 
       it 'returns data for write changes' do
@@ -35,12 +35,12 @@ describe Dandelion::Changeset do
       it 'returns all changes' do
         expect(changes).to be_a(Array)
         expect(changes.length).to eq 2
-        expect(changes.map(&:path)).to eq ['bar', 'foo']
-        expect(changes.map(&:type)).to eq [:write, :delete]
+        expect(changes.map(&:path)).to eq ['foo', 'bar']
+        expect(changes.map(&:type)).to eq [:delete, :write]
       end
 
       it 'returns data for write changes' do
-        expect(changes.first.data).to eq "bar\n"
+        expect(changes.last.data).to eq "bar\n"
       end
     end
 

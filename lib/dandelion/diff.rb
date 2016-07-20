@@ -34,13 +34,9 @@ private
     end
 
     def each
-      @deltas.each do |delta|
-        if delta.deleted?
-          yield Change.new(delta.old_file[:path], :delete)
-        else
-          yield Change.new(delta.new_file[:path], :write)
-        end
-      end
+      deletes, writes = @deltas.partition(&:deleted?)
+      deletes.each { |delta| yield Change.new(delta.old_file[:path], :delete) }
+      writes.each { |delta| yield Change.new(delta.new_file[:path], :write) }
     end
   end
 
