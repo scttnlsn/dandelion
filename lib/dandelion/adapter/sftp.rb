@@ -55,6 +55,19 @@ module Dandelion
         end
       end
 
+      def symlink(file, target)
+        begin
+          @sftp.symlink!(target, path(file))
+        rescue Net::SFTP::StatusException => e
+          if e.code == 2
+            mkdir_p(File.dirname(path(file)))
+          else
+            @sftp.remove!(path(file))
+          end
+          @sftp.symlink!(target, path(file))
+        end
+      end
+
       def to_s
         "sftp://#{@config['username']}@#{@config['host']}/#{@config['path']}"
       end

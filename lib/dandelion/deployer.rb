@@ -50,6 +50,13 @@ module Dandelion
       when :delete
         log.debug("Deleting file: #{change.path}")  
         @adapter.delete(change.path)
+      when :symlink
+        if @adapter.respond_to?(:symlink)
+          log.debug("Creating symlink: #{change.path}")
+          @adapter.symlink(change.path, change.data)
+        else
+          log.debug("Skipped creating symlink:  #{change.path} -> #{change.data}")
+        end
       end
     end
 

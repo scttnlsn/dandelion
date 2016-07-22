@@ -9,6 +9,9 @@ module Dandelion
 
       def delete(path)
       end
+
+      def symlink(path, data)
+      end
     end
   end
 end
