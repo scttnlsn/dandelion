@@ -1,7 +1,6 @@
 module Dandelion
   class Change
     attr_reader :path, :type
-    attr_accessor :type
     
     def initialize(path, type, read = nil)
       @path = path
