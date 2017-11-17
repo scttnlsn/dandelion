@@ -10,6 +10,11 @@ module Dandelion
       requires_gems 'net-sftp'
 
       def initialize(config)
+        begin
+          require 'highline/import'
+        rescue LoadError
+        end
+        
         require 'net/sftp'
 
         @config = config
