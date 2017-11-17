@@ -117,6 +117,14 @@ module Dandelion
         log.fatal("Missing config file: #{config_path}")
         exit 1
       end
+
+      begin
+        config
+      rescue Psych::SyntaxError => e
+        log.fatal("There's a syntax error in your config file: #{config_path}")
+        log.fatal(e)
+        exit 1
+      end
     end
 
     def parse!(parser)
