@@ -26,7 +26,11 @@ private
 
   class PartialDiff
     def initialize(diff)
-      @deltas = diff.deltas
+      @deltas = []
+
+      diff.each_delta do |delta|
+        @deltas << delta
+      end
     end
 
     def empty?
@@ -42,7 +46,11 @@ private
 
   class FullDiff
     def initialize(diff)
-      @deltas = diff.patches.map(&:delta)
+      @deltas = []
+      
+      diff.each_patch do |patch|
+        @deltas << patch.delta
+      end
     end
 
     def empty?
