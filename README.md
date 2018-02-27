@@ -22,6 +22,8 @@ or
 
     $ apt-get install pkg-config cmake
 
+You may also need to install the Ruby headers if you're using a version of Ruby installed by your OS package manager (`ruby-dev` on Debian, `ruby-all-dev` on Ubuntu).
+
 Config
 ------
 
