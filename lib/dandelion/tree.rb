@@ -1,5 +1,10 @@
 module Dandelion
   class Tree
+    # https://github.com/libgit2/libgit2/blob/development/include/git2/types.h
+    FILEMODE_BLOB = 0100644
+    FILEMODE_BLOB_EXECUTABLE = 0100755
+    FILEMODE_SYMLINK = 0120000
+
     attr_reader :commit
 
     def initialize(repo, commit)
@@ -7,34 +12,42 @@ module Dandelion
       @commit = commit
     end
 
-    def is_symlink?(path)
-      # https://github.com/libgit2/libgit2/blob/development/include/git2/types.h
-      @commit.tree.path(path)[:filemode] == 0120000
+    def symlink?(path)
+      filemode(path) == FILEMODE_SYMLINK
+    end
+
+    def blob?(path)
+      mode = filemode(path)
+      mode == FILEMODE_BLOB || mode == FILEMODE_BLOB_EXECUTABLE
     end
 
     def data(path)
-      submodule = @repo.submodules[path]
-
-      if submodule
+      if blob?(path) || symlink?(path)
+        obj = object(path)
+        blob_content(obj)
+      else
         # TODO
         nil
-      else
-        info, obj = object(path)
-        blob_content(obj)
       end
     end
 
     private
 
+    def info(path)
+      @commit.tree.path(path)
+    end
+
+    def filemode(path)
+      info(path)[:filemode]
+    end
+
     def object(path)
-      info = @commit.tree.path(path)
-      object = @repo.lookup(info[:oid])
-      [info, object]
+      oid = info(path)[:oid]
+      @repo.lookup(oid)
     end
 
     def blob_content(object)
       object.read_raw.data
     end
-
   end
 end
