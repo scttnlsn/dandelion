@@ -25,8 +25,8 @@ module Dandelion
             yield Change.new(path, change.type)
           else
             read = -> { @tree.data(change.path) }
-            
-            if @tree.is_symlink?(change.path)
+
+            if @tree.symlink?(change.path)
               yield Change.new(path, :symlink, read)
             else
               yield Change.new(path, change.type, read)
