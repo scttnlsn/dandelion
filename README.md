@@ -1,8 +1,7 @@
 Dandelion
 =========
 [![Gem Version](https://badge.fury.io/rb/dandelion.png)](http://badge.fury.io/rb/dandelion)
-[![Build Status](https://travis-ci.org/scttnlsn/dandelion.png)](https://travis-ci.org/scttnlsn/dandelion)
-[![Code Climate](https://codeclimate.com/github/scttnlsn/dandelion.png)](https://codeclimate.com/github/scttnlsn/dandelion)
+[![Test Status](https://github.com/scttnlsn/dandelion/actions/workflows/test.yml/badge.svg)](https://github.com/scttnlsn/dandelion/actions/workflows/test.yml)
 
 Incremental Git repository deployment.
 
