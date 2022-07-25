@@ -8,6 +8,8 @@ module Dandelion
       adapter 'ftps'
 
       def initialize(config)
+        require 'net/ftp'
+
         config[:ftps_implicit] = to_b(config[:ftps_implicit])
         config[:insecure] = to_b(config[:insecure])
 
