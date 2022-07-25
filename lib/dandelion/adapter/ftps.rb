@@ -8,8 +8,6 @@ module Dandelion
       adapter 'ftps'
 
       def initialize(config)
-        require 'double_bag_ftps'
-
         config[:ftps_implicit] = to_b(config[:ftps_implicit])
         config[:insecure] = to_b(config[:insecure])
 
@@ -35,7 +33,7 @@ module Dandelion
              password: @config['password'],
              debug_mode: @config['debug']
           }
-        
+        end
       end
 
       def ssl_context_params
